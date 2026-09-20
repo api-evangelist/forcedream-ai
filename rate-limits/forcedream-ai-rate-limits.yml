@@ -1,0 +1,115 @@
+specification: API Commons Rate Limits
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/RateLimits
+provider: ForceDream
+providerId: forcedream-ai
+generated: '2026-09-19'
+method: searched
+source: https://www.forcedream.com/developers/rate-limits
+created: '2026-09-19'
+modified: '2026-09-19'
+tags:
+  - Rate Limiting
+  - AI Agents
+description: >-
+  ForceDream documents token-bucket rate limits per subscription tier with four response headers and a 429 on
+  exhaustion. Several other limits are published elsewhere and recorded here too: a 60 requests/minute
+  per-account limit on the A2A runtime, a 5-per-IP-per-hour signup limit declared in the agent card, a
+  100-calls/hour sandbox limit, and a daily earn limit that resets at midnight UTC. The MCP endpoint returned
+  X-RateLimit-Limit: 120 to an anonymous client during profiling — a value that appears on no documented tier
+  and is recorded as observed.
+sources:
+  - https://www.forcedream.com/developers/rate-limits
+  - https://github.com/forcedreamai/forcedream-a2a-agent/blob/main/examples/retry-backoff.md
+  - https://api.forcedream.ai/.well-known/agent-card.json
+  - https://www.forcedream.com/sandbox
+  - https://www.forcedream.com/developers/errors
+  - live response headers from https://api.forcedream.ai/v1/mcp, 2026-09-19
+algorithm: token bucket
+headers:
+  limit: X-RateLimit-Limit
+  remaining: X-RateLimit-Remaining
+  reset: X-RateLimit-Reset
+  retryAfter: Retry-After
+  header_semantics:
+    X-RateLimit-Limit: Requests allowed per minute
+    X-RateLimit-Remaining: Requests remaining in current window
+    X-RateLimit-Reset: Unix timestamp when window resets
+    Retry-After: Seconds to wait if rate limited (429 responses only)
+responseCodes:
+  throttled: 429
+  dailyLimit: 429
+limit_count: 9
+limits:
+  - name: Free tier
+    scope: account
+    metric: requests_per_minute
+    limit: 60
+    timeFrame: minute
+    burst: 10
+    concurrent: 2
+    daily: 1000
+  - name: Starter tier
+    scope: account
+    metric: requests_per_minute
+    limit: 300
+    timeFrame: minute
+    burst: 50
+    concurrent: 5
+    daily: 10000
+  - name: Pro tier
+    scope: account
+    metric: requests_per_minute
+    limit: 1000
+    timeFrame: minute
+    burst: 200
+    concurrent: 20
+    daily: 50000
+  - name: Scale tier
+    scope: account
+    metric: requests_per_minute
+    limit: 5000
+    timeFrame: minute
+    burst: 1000
+    concurrent: 100
+    daily: 500000
+  - name: Enterprise tier
+    scope: account
+    metric: requests_per_minute
+    limit: -1
+    timeFrame: minute
+    note: '"Unlimited" requests; burst and concurrency "Custom"'
+  - name: A2A runtime per-account limit
+    scope: account
+    metric: requests_per_minute
+    limit: 60
+    timeFrame: minute
+    error_code: rate_limit_exceeded
+    source: https://github.com/forcedreamai/forcedream-a2a-agent/blob/main/examples/retry-backoff.md
+  - name: Self-service signup
+    scope: ip
+    endpoint: POST /api/signup
+    metric: requests_per_hour
+    limit: 5
+    timeFrame: 3600 seconds
+    source: agent card self-service-credentials extension
+  - name: Hosted sandbox
+    scope: shared-test-account
+    metric: calls_per_hour
+    limit: 100
+    timeFrame: hour
+    source: https://www.forcedream.com/sandbox
+  - name: Daily earn limit
+    scope: account
+    metric: earn_events_per_day
+    limit: null
+    timeFrame: day
+    note: '"Daily limit reached" -> 429; resets at midnight UTC. The numeric ceiling is not published.'
+observed:
+  - endpoint: POST https://api.forcedream.ai/v1/mcp (anonymous)
+    headers: {x-ratelimit-limit: '120', x-ratelimit-remaining: '119', x-ratelimit-reset: '1789873576'}
+    note: Limit value not on any documented tier; window inferred from reset (unix seconds) not stated.
+  - endpoint: GET https://api.forcedream.ai/v1/agents/lead-score-v1 (401) and GET /v1/account/balance (401)
+    headers: none
+    note: Unauthenticated REST rejections carried no rate-limit headers.
+backoff_guidance: '"Set backoffMs to at least 1000ms and maxBackoffMs to several seconds so retries land in the next rate-limit window" (A2A retry guide); docs example honours Retry-After then falls back to 2^attempt seconds.'

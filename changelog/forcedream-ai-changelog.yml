@@ -1,0 +1,141 @@
+generated: '2026-09-19'
+method: searched
+source: https://www.forcedream.com/changelog
+sources:
+  - https://www.forcedream.com/changelog
+  - https://github.com/forcedreamai/forcedream-mcp/blob/main/CHANGELOG.md
+description: >-
+  Structured capture of ForceDream's dated platform changelog ("Every platform update documented"), most
+  recent entries first, plus the MCP server's own CHANGELOG. Entries are the provider's text, lightly
+  condensed; the live page is the source of truth. The page header reads "Current: v38.70 · 69/69 tests · 36
+  products" while the site footer still prints "OS v36.46" — the footer is stale, the changelog is not.
+docs: https://www.forcedream.com/changelog
+versioning:
+  scheme: numbered platform releases with date ranges, tagged Major/Minor
+  current: v38.70
+  current_date: '2026-08-17'
+  detail: lifecycle/forcedream-ai-lifecycle.yml
+entries:
+  - version: v38.70
+    date: '2026-08-17'
+    range: 14–17 August 2026
+    kind: Minor
+    title: A2A settlement accuracy, Google Vertex evidence chain, provider pinning
+    breaking:
+      - Two legacy execution endpoints retired (public documentation moved to the A2A paths first)
+    additions:
+      - A2A settlement income now appears in the developer wallet statement
+      - Agent reputation and earnings are now per agent rather than combined across an owner's agents
+      - Explicit provider pinning for A2A execution — the pinned provider serves the task or the request fails terminally
+      - Every Google Vertex AI execution carries Google's own response ID, reconcilable against Cloud audit logs
+      - Real Vertex token counts reach the billing ledger
+      - Supplier cost and margin report null where measurement coverage is insufficient
+      - New agent document-intelligence-v1 (summaries, executive summaries, action items, entity extraction)
+      - Independent third-party audit of the cryptographic proofs found zero discrepancies
+    fixes:
+      - Document-processing tasks intermittently failing to complete
+      - Proof lookup immediately after completion briefly showing "not found" instead of pending
+  - version: v38.50
+    date: '2026-08-02'
+    range: 1–2 August 2026
+    kind: Minor
+    title: Dispatcher parallelism, revenue-integrity audit
+    additions:
+      - Dispatcher handles multiple tasks per cycle
+      - Marketplace capabilities — Sponsored Discovery, Marketplace Reputation Score, bundle upsells, priority-tier pricing
+    fixes:
+      - A class of routes that could credit developer earnings without a matching charge
+  - version: v38.30
+    date: '2026-07-30'
+    range: 24–30 July 2026
+    kind: Minor
+    title: Four agents rebuilt as verified, multi-source pipelines
+    additions:
+      - sentiment-v1 (14 sources), lead-score-v1 (8 sources), code-generation-v1 (6 verification modules) rebuilt; data-extract-v1 gained live Wikidata entity verification
+    fixes:
+      - Marketplace and agent-listing pages taking ~16 seconds to load
+  - version: v38.20
+    date: '2026-07-23'
+    range: 21–23 July 2026
+    kind: Minor
+    title: Proof reliability, content integrity, security-scan-v1
+    additions:
+      - New agent security-scan-v1 (live CVE + secrets detection)
+      - Interactive 3D agent network visualiser
+      - Removed fabricated architecture claims and placeholder metrics from public pages
+    fixes:
+      - Cryptographic proofs not always generated for successfully completed, billed work
+  - version: v38.10
+    date: '2026-07-20'
+    range: 17–20 July 2026
+    kind: Minor
+    title: Revenue-integrity ledger, external A2A runtime
+    additions:
+      - External Agent-to-Agent runtime — first outward-facing A2A execution surface
+      - Revenue/earnings figures trace only to real settlements
+    fixes:
+      - Agent-to-agent billing bug where the wrong party could be charged or paid
+  - version: v38.00
+    date: '2026-07-17'
+    range: 9–17 July 2026
+    kind: Minor
+    title: MCP registry publication, marketplace developer tools
+    additions:
+      - MCP server published to the official MCP Registry
+      - Per-developer marketplace metrics, agent comparison, per-agent SEO pages, invocation tracking, leaderboards
+    fixes:
+      - Public developer leaderboard had been empty since launch
+  - version: v37.90
+    date: '2026-07-09'
+    range: 6–9 July 2026
+    kind: Major
+    title: Adaptive Intelligence Engine
+    additions:
+      - Routing factors in live cost, latency and quality; every routing decision carries a confidence score and can be replayed
+      - Enterprise organisation model with admin authentication
+  - version: v37.80
+    date: '2026-07-05'
+    range: 3–5 July 2026
+    kind: Major
+    title: Multi-step agent chain orchestration
+  - version: v37.70
+    date: '2026-07-03'
+    range: 29 June – 3 July 2026
+    kind: Major
+    title: Agent-to-agent economy goes live
+    additions:
+      - Agent-to-agent invocations complete real, billable work end-to-end
+      - Stripe balance top-up; PawaPay mobile-money payout corridor
+      - Integration agents — fraud detection, embeddings, semantic cache, market data, KYC
+  - version: v37.60
+    date: '2026-06-30'
+    range: 28–30 June 2026
+    kind: Minor
+    title: Marketplace goes live with real agents
+  - version: v37.00
+    date: '2026-06-28'
+    kind: Major
+    title: MCP connector, OAuth 2.1 & trustless proof verification
+    additions:
+      - Remote MCP server; search_agents, verify_proof (no key), invoke_agent (OAuth)
+      - OAuth 2.1 + PKCE sign-in; public proof pages at forcedream.com/proof; Stripe live checkout
+  - version: v36.45
+    date: '2026-05-15'
+    kind: Major
+    title: 36 products, admin dashboard, withdrawal queue
+  - version: v36.01
+    date: '2026-05-14'
+    kind: Major
+    title: forcedream.ai live — OS cockpit
+mcp_server_changelog:
+  source: https://github.com/forcedreamai/forcedream-mcp/blob/main/CHANGELOG.md
+  latest_documented: v0.5.1
+  npm_latest: 0.12.2 (2026-08-21)
+  entries:
+    - {version: v0.5.1, breaking: true, note: 'All tool names prefixed forcedream_ (search_agents -> forcedream_search_agents), matching the remote server'}
+    - {version: v0.4.2, note: Expanded npm keywords}
+    - {version: v0.4.0, note: '--json and --quiet flags on fd-verify'}
+    - {version: v0.3.0, note: 'Added search_reliability, search_costs, search_providers; fd-verify CLI; FD_MOCK_MODE'}
+    - {version: v0.2.0, note: Split out of the private monorepo into a public repository}
+    - {version: v0.1.0, note: 'Initial public release — search_agents, verify_proof, invoke_agent'}
+  note: The CHANGELOG stops at v0.5.1 while npm is at 0.12.2; 0.6–0.12 are undocumented in the repo.

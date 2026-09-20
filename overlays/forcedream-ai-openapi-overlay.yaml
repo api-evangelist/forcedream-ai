@@ -1,0 +1,86 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the ForceDream API (SDK-verified surface)
+  version: 1.0.0
+  description: >-
+    Non-destructive Overlay 1.0.0 applied to openapi/forcedream-ai-openapi.yml. Adds tags, operational
+    metadata the docs publish but the spec omits (rate-limit headers, the 429 and 404 error shapes, the
+    async polling contract, key prefixes), and links to the sibling artifacts. The original spec is never
+    mutated; this file records what we would add.
+x-provenance:
+  generated: '2026-09-19'
+  method: generated
+  source: openapi/forcedream-ai-openapi.yml + https://www.forcedream.com/developers/rate-limits + /developers/errors
+extends: forcedream-ai-openapi.yml
+actions:
+  - target: $.info
+    update:
+      x-apievangelist:
+        provider: forcedream-ai
+        conventions: conventions/forcedream-ai-conventions.yml
+        errors: errors/forcedream-ai-problem-types.yml
+        rate_limits: rate-limits/forcedream-ai-rate-limits.yml
+        authentication: authentication/forcedream-ai-authentication.yml
+  - target: $
+    update:
+      tags:
+        - {name: Onboarding, description: Self-service account and credential issuance}
+        - {name: Account, description: Balance and account state}
+        - {name: Agents, description: Discovery, reliability and invocation of marketplace agents}
+        - {name: Proofs, description: Ed25519 execution proofs and the signing key}
+  - target: $.paths['/api/signup'].post
+    update: {tags: [Onboarding]}
+  - target: $.paths['/v1/account/balance'].get
+    update: {tags: [Account]}
+  - target: $.paths['/v1/agents/list'].get
+    update: {tags: [Agents]}
+  - target: $.paths['/v1/agents/reliability'].get
+    update: {tags: [Agents]}
+  - target: $.paths['/v1/agents/{slug}/invoke'].post
+    update:
+      tags: [Agents]
+      x-async: {poll: '/v1/agents/{slug}/result/{taskId}', terminal_states: [completed, failed, dead_letter, frozen]}
+      x-billing: charged only on successful, schema-valid completion
+  - target: $.paths['/v1/agents/{slug}/result/{taskId}'].get
+    update: {tags: [Agents]}
+  - target: $.paths['/v1/workforce/proof/public-key'].get
+    update: {tags: [Proofs]}
+  - target: $.paths['/v1/workforce/proof/{task_id}/public'].get
+    update: {tags: [Proofs]}
+  - target: $.components
+    update:
+      headers:
+        X-RateLimit-Limit: {schema: {type: integer}, description: Requests allowed per minute}
+        X-RateLimit-Remaining: {schema: {type: integer}, description: Requests remaining in current window}
+        X-RateLimit-Reset: {schema: {type: integer}, description: Unix timestamp when window resets}
+        Retry-After: {schema: {type: integer}, description: Seconds to wait if rate limited (429 responses only)}
+      responses:
+        RateLimited:
+          description: Rate Limited — too many requests; check Retry-After
+          headers:
+            Retry-After: {$ref: '#/components/headers/Retry-After'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Error'}
+        NotFound:
+          description: Route not found
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Error'}
+              example: {error: Route not found}
+      schemas:
+        Error:
+          type: object
+          required: [error]
+          properties:
+            error: {type: string, description: machine-readable code}
+            message: {type: string}
+            detail: {type: string}
+            path: {type: string}
+  - target: $.paths.*.*.responses
+    update:
+      '429': {$ref: '#/components/responses/RateLimited'}
+  - target: $.components.securitySchemes.bearerAuth
+    update:
+      x-key-prefixes: [fd_live_, sk_fd_]
+      x-self-service: POST /api/signup

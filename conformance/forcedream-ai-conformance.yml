@@ -1,0 +1,148 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  well-known/forcedream-ai-oauth-authorization-server.json, well-known/forcedream-ai-oauth-protected-resource.json,
+  well-known/forcedream-ai-jwks.json, well-known/forcedream-ai-security.txt, a2a/forcedream-ai-agent-card.json,
+  mcp/forcedream-ai-mcp-initialize.json, openapi/forcedream-ai-openapi.yml, https://www.forcedream.com/trust/compliance,
+  https://www.forcedream.com/developers/webhooks, /developers/errors, /developers/rate-limits, /privacy.
+description: >-
+  Standards ForceDream's published contracts declare, with the evidence location for each. The domain
+  standards for an AI-agent marketplace are the agent protocols themselves — MCP and A2A — and both are
+  declared in machine-readable form on the provider's own host, not merely claimed in prose. Compliance
+  claims from the trust centre are recorded as the provider states them, including the two it explicitly
+  says it does NOT hold.
+standards:
+  - id: mcp
+    name: Model Context Protocol 2025-06-18
+    conforms: true
+    domain_standard: true
+    evidence: >-
+      initialize on https://api.forcedream.ai/v1/mcp returns protocolVersion "2025-06-18" with tools/resources/
+      prompts capabilities; tools/list returns 21 tools each with a JSON Schema inputSchema (most with
+      outputSchema and annotations). mcp/forcedream-ai-mcp-initialize.json, mcp/forcedream-ai-mcp-tools-list.json.
+  - id: a2a
+    name: Agent2Agent protocol 1.0
+    conforms: true
+    domain_standard: true
+    evidence: >-
+      /.well-known/agent-card.json on api.forcedream.ai and forcedream.ai — protocolVersion "1.0", capabilities
+      object, skills array (18), preferredTransport JSONRPC, defaultInput/OutputModes, securitySchemes; the
+      endpoint answers JSON-RPC message/send. Graded conformant in a2a/forcedream-ai-a2a.yml.
+  - id: a2ui
+    name: A2UI v0.9 (A2A extension)
+    conforms: true
+    evidence: capabilities.extensions[] uri https://a2ui.org/a2a-extension/a2ui/v0.9 with surface/action endpoints; GET /v1/a2ui/surface returns a v0.9 createSurface/updateComponents message list (probed 200).
+  - id: oauth2
+    name: OAuth 2.1 (authorization code + PKCE)
+    conforms: true
+    evidence: >-
+      RFC 8414 metadata at /.well-known/oauth-authorization-server — grant_types [authorization_code,
+      refresh_token], code_challenge_methods_supported [S256], token_endpoint_auth_methods [none,
+      client_secret_post]; agent card securitySchemes.oauth2.flows.authorizationCode.
+  - id: rfc8414
+    name: OAuth 2.0 Authorization Server Metadata
+    conforms: true
+    evidence: well-known/forcedream-ai-oauth-authorization-server.json (issuer https://api.forcedream.ai).
+  - id: rfc9728
+    name: OAuth 2.0 Protected Resource Metadata
+    conforms: true
+    evidence: well-known/forcedream-ai-oauth-protected-resource.json — resource https://api.forcedream.ai/v1/mcp, authorization_servers, scopes_supported, bearer_methods_supported [header]. Served on the resource host itself.
+  - id: rfc7591
+    name: OAuth 2.0 Dynamic Client Registration
+    conforms: true
+    evidence: registration_endpoint https://api.forcedream.ai/v1/oauth/register in the AS metadata; the agent card's DCR extension states "Registration requires no pre-shared credential and no human step" and cites RFC 7591. (GET on the endpoint 404s; registration is POST-only and was not exercised.)
+  - id: rfc7636
+    name: PKCE
+    conforms: true
+    evidence: code_challenge_methods_supported [S256].
+  - id: oidc
+    name: OpenID Connect Discovery
+    conforms: false
+    evidence: /.well-known/openid-configuration returns 404 on every host; the AS metadata advertises no id_token / openid scope.
+  - id: rfc7517
+    name: JSON Web Key Set
+    conforms: true
+    evidence: /.well-known/jwks.json — EC P-256 ES256 key (kid b9ce5d84d3ca) and OKP Ed25519 EdDSA key (kid bc21b1928474).
+  - id: jws-signed-agent-card
+    name: JWS (RFC 7515) signature on the A2A card
+    conforms: true
+    evidence: 'agent card signatures[] with protected header {"alg":"ES256","kid":"b9ce5d84d3ca"} matching the JWKS; signature not verified by this pass.'
+  - id: ed25519-proofs
+    name: Ed25519 (RFC 8032) execution proofs
+    conforms: true
+    evidence: >-
+      GET /v1/workforce/proof/public-key returns the Ed25519 PEM (key_id bc21b1928474); GET
+      /v1/workforce/proof/{task_id}/public returns signed proofs (algorithms Ed25519 and Ed25519-batched with
+      Merkle inclusion); the exact canonicalisation is specified in the OpenAPI's x-forcedream-canonicalization
+      extension and cross-tested by the forcedream-sdk-conformance suite.
+  - id: rfc9116
+    name: security.txt
+    conforms: partial
+    evidence: /.well-known/security.txt served on all four reachable hosts with Contact, Preferred-Languages, Canonical and Policy — but no Expires field, which RFC 9116 requires.
+  - id: rfc9457
+    name: Problem Details for HTTP APIs
+    conforms: false
+    evidence: 'Errors are {"error","message","detail","path"} JSON, not application/problem+json (developers/errors).'
+  - id: rate-limit-headers
+    name: X-RateLimit-* + Retry-After (de facto)
+    conforms: true
+    evidence: developers/rate-limits documents X-RateLimit-Limit/Remaining/Reset and Retry-After; observed live on /v1/mcp. Not the IETF draft RateLimit-Policy/RateLimit headers.
+  - id: idempotency
+    name: Idempotent replay of writes
+    conforms: partial
+    evidence: idempotency_key on forcedream_execute_plan (MCP) and messageId replay on A2A message/send; no documented Idempotency-Key on REST invoke (conventions/forcedream-ai-conventions.yml).
+  - id: pagination
+    name: List pagination
+    conforms: false
+    evidence: No limit/cursor parameters on any list operation in the spec or docs.
+  - id: webhook-signing
+    name: HMAC-SHA256 webhook signatures
+    conforms: true
+    evidence: developers/webhooks — X-ForceDream-Signature is HMAC-SHA256 of the payload body with the endpoint secret; every payload carries a WORM seal.
+  - id: openapi-3.1
+    name: OpenAPI 3.1.0
+    conforms: true
+    evidence: openapi/forcedream-ai-openapi.yml (github.com/forcedreamai/forcedream-openapi, validated in CI with openapi-spec-validator).
+  - id: mcp-registry-server-json
+    name: MCP Registry server.json schema 2025-12-11
+    conforms: true
+    evidence: server.json in forcedreamai/forcedream-mcp declares $schema static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json; registry entry io.github.forcedreamai/mcp-server is active.
+  - id: uk-gdpr
+    name: UK GDPR
+    conforms: true
+    claimed: true
+    evidence: trust/compliance lists "UK GDPR — Data residency in eu-west-2 London. DPA available on request."; privacy policy names the controller (ForceDream Ltd, Company No. 17057770), sub-processors, residency and rights.
+  - id: cyber-essentials-plus
+    name: Cyber Essentials Plus
+    conforms: true
+    claimed: true
+    evidence: trust/compliance "Cyber Essentials+ — UK government-backed cyber security certification" (tick); certificate number not published.
+  - id: soc2
+    name: SOC 2 Type II
+    conforms: false
+    claimed: false
+    evidence: '"ForceDream is not SOC 2 certified. Our hosting provider, Google Cloud, is certified for the data centres we run in." (trust/compliance); /v1/capabilities reports soc2: planned. The site footer’s "SOC2 in progress" badge is consistent with that.'
+  - id: iso-27001
+    name: ISO/IEC 27001
+    conforms: false
+    claimed: false
+    evidence: '"ForceDream is not certified. Google Cloud holds ISO/IEC 27001 for the London region we run in." (trust/compliance); /v1/capabilities iso_27001: planned.'
+  - id: fca-consumer-duty
+    name: FCA Consumer Duty (PS22/9) evidence workflows
+    conforms: true
+    claimed: true
+    evidence: trust/compliance lists it as a certification tick ("Evidence gathering and audit workflows for PS22/9") and the API reference has POST /v1/compliance/fca-report. This is a product capability, not a certification of ForceDream itself.
+  - id: pci-dss
+    name: PCI DSS
+    conforms: null
+    evidence: Not claimed; payments are processed by Stripe/Payoneer/PawaPay per the site disclaimer ("ForceDream does not hold customer funds").
+domain_standard_signature:
+  market: AI agent marketplace / agent execution and settlement
+  declared_in_contract:
+    - {standard: MCP, location: 'https://api.forcedream.ai/v1/mcp initialize.protocolVersion = 2025-06-18; tools[].inputSchema'}
+    - {standard: A2A, location: 'https://api.forcedream.ai/.well-known/agent-card.json protocolVersion = 1.0; skills[]; capabilities.extensions[]'}
+    - {standard: RFC 9728 / RFC 8414 / RFC 7591, location: /.well-known/oauth-protected-resource, /.well-known/oauth-authorization-server}
+  note: Reward-only; recorded because the contract itself declares the standard, not because a marketing page mentions it.
+compliance_program_published: true
+certifications_claimed: [UK GDPR, Cyber Essentials Plus]
+certifications_explicitly_not_held: [SOC 2 Type II, ISO/IEC 27001]

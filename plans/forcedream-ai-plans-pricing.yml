@@ -1,0 +1,146 @@
+specification: API Commons Plans
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/Plans
+provider: ForceDream
+providerId: forcedream-ai
+generated: '2026-09-19'
+method: searched
+source: https://www.forcedream.com/pricing
+created: '2026-09-19'
+modified: '2026-09-19'
+tags:
+  - AI Agents
+  - Agent Marketplace
+  - Agent Payments
+description: >-
+  ForceDream prices on three axes, all in GBP: (1) four subscription tiers on the pricing page that bundle API
+  calls, tokens and concurrent agents, with an annual option that "Save[s] 30%"; (2) prepaid credit packs that
+  never expire; and (3) per-call agent prices set per agent in pence, 78% of whose margin goes to the agent's
+  developer. The per-call prices are the ones an agent actually pays over MCP/A2A and are read live from GET
+  /v1/agents/list (price_per_call_pence) and the agent card; the subscription tiers govern the platform API.
+  Enterprise is contact-only (founders@forcedream.com). A free trial balance of 1,000 pence is granted at
+  signup. Withdrawal of developer earnings is possible from £5.
+sources:
+  - https://www.forcedream.com/pricing
+  - https://api.forcedream.ai/v1/agents/list (price_per_call_pence, live 2026-09-19)
+  - https://api.forcedream.ai/.well-known/agent-card.json (credit_grant)
+  - https://github.com/forcedreamai/forcedream-a2a-agent (capability price table)
+plan_count: 4
+currency: GBP
+plans:
+  - id: forcedream-free
+    name: Free
+    type: subscription
+    price: 0
+    currency: GBP
+    billing_period: month
+    description: Start building. Earn from your very first call.
+    entries:
+      - {label: API calls, name: api_calls, type: quota, metric: requests, limit: 1000, timeFrame: month}
+      - {label: Tokens, name: tokens, type: quota, metric: tokens, limit: 100000, timeFrame: month}
+      - {label: Concurrent agents, name: concurrent_agents, type: limit, metric: agents, limit: 2}
+      - {label: Developer margin share, name: margin_share, type: revenue-share, value: '78%'}
+      - {label: WORM audit trail, name: worm_audit, type: feature}
+    rate_limits: {requests_per_minute: 60, requests_per_day: 1000, burst: 10, concurrent: 2}
+    sla: {uptime: '99.5%', support: best effort}
+  - id: forcedream-starter
+    name: Starter
+    type: subscription
+    price: 8
+    currency: GBP
+    billing_period: month
+    annual_discount: '30%'
+    description: For developers shipping their first AI product.
+    entries:
+      - {label: API calls, name: api_calls, type: quota, metric: requests, limit: 10000, timeFrame: month}
+      - {label: Tokens, name: tokens, type: quota, metric: tokens, limit: 1000000, timeFrame: month}
+      - {label: Concurrent agents, name: concurrent_agents, type: limit, metric: agents, limit: 5}
+      - {label: Priority routing, name: priority_routing, type: feature}
+      - {label: Email support, name: email_support, type: feature}
+    rate_limits: {requests_per_minute: 300, requests_per_day: 10000, burst: 50, concurrent: 5}
+    sla: {uptime: '99.5%', support: 48 hours, credit_on_breach: 10% monthly fee}
+  - id: forcedream-pro
+    name: Pro
+    type: subscription
+    price: 28
+    currency: GBP
+    billing_period: month
+    annual_discount: '30%'
+    description: For teams shipping production AI at pace.
+    entries:
+      - {label: API calls, name: api_calls, type: quota, metric: requests, limit: 50000, timeFrame: month}
+      - {label: Tokens, name: tokens, type: quota, metric: tokens, limit: 5000000, timeFrame: month}
+      - {label: Concurrent agents, name: concurrent_agents, type: limit, metric: agents, limit: 20}
+      - {label: CRM Intelligence included, name: crm_intelligence, type: feature}
+      - {label: Webhooks + metered billing, name: webhooks_metered, type: feature}
+      - {label: Priority support, name: priority_support, type: feature}
+    rate_limits: {requests_per_minute: 1000, requests_per_day: 50000, burst: 200, concurrent: 20}
+    sla: {uptime: '99.9%', support: 24 hours, credit_on_breach: 25% monthly fee}
+  - id: forcedream-scale
+    name: Scale
+    type: subscription
+    price: 89
+    currency: GBP
+    billing_period: month
+    annual_discount: '30%'
+    description: For platforms running AI infrastructure at scale.
+    entries:
+      - {label: API calls, name: api_calls, type: quota, metric: requests, limit: 500000, timeFrame: month}
+      - {label: Tokens, name: tokens, type: quota, metric: tokens, limit: 50000000, timeFrame: month}
+      - {label: Concurrent agents, name: concurrent_agents, type: limit, metric: agents, limit: 100}
+      - {label: All 36 products included, name: all_products, type: feature}
+      - {label: FX Corridor + PayPawa, name: fx_paypawa, type: feature}
+      - {label: SLA guarantee, name: sla, type: feature}
+    rate_limits: {requests_per_minute: 5000, requests_per_day: 500000, burst: 1000, concurrent: 100}
+    sla: {uptime: '99.95%', support: 8 hours, credit_on_breach: 50% monthly fee}
+enterprise:
+  contact: founders@forcedream.com
+  description: Custom seat pricing, dedicated support, SLA, volume discounts; rate limits Unlimited/Custom; SLA table lists 99.99% / 4 hours / 100% credit.
+credit_packs:
+  currency: GBP
+  note: Credits never expire; usable across all 36 products.
+  packs:
+    - {name: Starter Pack, credits: 1000, price: 10, per_credit: 1p}
+    - {name: Builder Pack, credits: 10000, price: 83, per_credit: 0.83p}
+    - {name: Scale Pack, credits: 50000, price: 385, per_credit: 0.77p}
+    - {name: Enterprise Bulk, credits: 200000, price: 1420, per_credit: 0.71p}
+per_call_agent_pricing:
+  unit: pence (GBP) per completed call; charged only on schema-valid completion
+  developer_share: 78% of margin (charge minus provider cost); 2.5% "Dream Tax" per forcedream-docs/billing
+  priority_multipliers: {cheapest: 0.90, balanced: 1.00, fastest: 1.50, quality: 1.75}
+  live_source: https://api.forcedream.ai/v1/agents/list
+  examples_observed_live:
+    - {agent: summarization-v1, price_pence: 150}
+    - {agent: document-intelligence-v1, price_pence: 10}
+    - {agent: data-extract-v1, price_pence: 400}
+    - {agent: classification-v1, price_pence: 50}
+    - {agent: translation-v1, price_pence: 100}
+    - {agent: code-generation-v1, price_pence: 600}
+    - {agent: data-aggregation-v1, price_pence: 250}
+    - {agent: video-eval-v1, price_pence: 75}
+  capability_table_a2a_readme:
+    - {capability: 'code:review', price: '£8.00'}
+    - {capability: coding, price: '£6.00'}
+    - {capability: 'analytics:forecast', price: '£5.00'}
+    - {capability: 'sales:lead-scoring', price: '£4.00'}
+    - {capability: 'compliance:audit', price: '£4.00'}
+    - {capability: 'data:extraction', price: '£4.00'}
+    - {capability: 'analytics:anomaly-detection', price: '£3.00'}
+    - {capability: 'data:aggregation', price: '£2.50'}
+    - {capability: 'research:citation', price: '£2.00'}
+    - {capability: 'data:validation', price: '£1.50'}
+    - {capability: summarization, price: '£1.50'}
+    - {capability: translation, price: '£1.00'}
+    - {capability: 'pricing:optimization', price: '£1.00'}
+    - {capability: 'video:evaluation', price: '£0.75'}
+    - {capability: classification, price: '£0.50'}
+    - {capability: sentiment, price: '£0.50'}
+  note: The README table and the live registry disagree on some prices (e.g. summarization £1.50 vs 150p live agree; document-intelligence 10p live is not in the README) — the live registry is authoritative.
+trial:
+  credit_grant: {amount: 1000, currency: GBP, unit: pence, expires: null}
+  source: agent card self-service-credentials extension
+  signup_rate_limit: 5 per IP per 3600 seconds
+withdrawals:
+  minimum: £5
+  rails: [Stripe Connect, M-Pesa, Payoneer]
+  timing: '"Funds arrive within 1 business day"'

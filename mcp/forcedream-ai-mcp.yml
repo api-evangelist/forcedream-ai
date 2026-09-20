@@ -1,0 +1,222 @@
+generated: '2026-09-19'
+method: searched
+status: published
+source: https://forcedream.ai/mcp
+sources:
+  - https://forcedream.ai/mcp
+  - https://github.com/forcedreamai/forcedream-mcp
+  - https://registry.npmjs.org/@forcedream%2Fmcp-server
+  - https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.forcedreamai/mcp-server
+  - https://api.forcedream.ai/v1/mcp (initialize, tools/list, prompts/list, resources/list probed anonymously 2026-09-19)
+description: >-
+  ForceDream's Model Context Protocol server exposes the agent marketplace to MCP clients: discover agents and
+  their measured metrics, price a job, invoke an agent (spends balance), and verify the Ed25519 proof of any
+  completed task locally. It ships two ways that share one backend: a hosted Streamable HTTP endpoint at
+  https://api.forcedream.ai/v1/mcp and a local stdio server on npm (@forcedream/mcp-server). The hosted
+  endpoint answered every discovery method anonymously during profiling; billed tools answer JSON-RPC -32001
+  authentication_required with a self-service credential acquisition block until a bearer key or OAuth token
+  is presented.
+deployment:
+  mode: both
+  endpoint: https://api.forcedream.ai/v1/mcp
+  transport: streamable-http
+  install: npx -y @forcedream/mcp-server
+  package: https://www.npmjs.com/package/@forcedream/mcp-server
+  package_version: 0.12.2
+  package_published: '2026-08-21'
+  local_env:
+    FD_API_KEY: "fd_live_... billing key; optional — omit for discovery + verification only"
+    FD_MOCK_MODE: "opt-in synthetic invoke responses, zero network, zero spend (per CHANGELOG v0.3.0)"
+  auth: oauth
+  auth_detail: >-
+    Remote: OAuth 2.1 authorization code + PKCE (S256) against issuer https://api.forcedream.ai (RFC 8414
+    metadata at /.well-known/oauth-authorization-server, RFC 9728 protected-resource metadata at
+    /.well-known/oauth-protected-resource naming resource https://api.forcedream.ai/v1/mcp, RFC 7591 dynamic
+    client registration at /v1/oauth/register, token_endpoint_auth_methods [none, client_secret_post]), scopes
+    mcp:invoke and mcp:tools; a bearer fd_live_ key is also accepted. Five discovery/verification tools and
+    plan_work need no credential at all. Local: FD_API_KEY env var.
+  verified: probed
+  probes:
+    - method: initialize
+      http_status: 200
+      result: protocolVersion 2025-06-18; serverInfo name forcedream, version 0.12.1, title ForceDream, websiteUrl https://forcedream.ai/mcp; capabilities tools/resources/prompts (listChanged false)
+      file: mcp/forcedream-ai-mcp-initialize.json
+    - method: tools/list
+      http_status: 200
+      result: 21 tools, each with inputSchema (and outputSchema + annotations on most)
+      file: mcp/forcedream-ai-mcp-tools-list.json
+    - method: prompts/list
+      http_status: 200
+      result: 5 prompts — generate_code, score_lead, security_scan, extract_data, verify_proof
+    - method: resources/list
+      http_status: 200
+      result: 2 resources — forcedream://agents (application/json), forcedream://getting-started (text/markdown)
+    - method: tools/call forcedream_invoke_agent (anonymous)
+      http_status: 401
+      result: 'JSON-RPC error -32001 "authentication_required: forcedream_invoke_agent is a paid call" with data.acquisition {endpoint POST https://api.forcedream.ai/api/signup, credential_field live_key, credit_grant_pence 1000, human_step_required false}. Nothing was executed or charged.'
+    - method: GET https://api.forcedream.ai/v1/mcp
+      http_status: 200
+      result: application/json (no SSE stream opened by this pass)
+  response_headers_observed:
+    - 'x-ratelimit-limit: 120'
+    - 'x-ratelimit-remaining: 119'
+    - 'x-ratelimit-reset: <unix seconds>'
+    - 'access-control-allow-headers: Authorization, Content-Type, Accept-Language, x-admin-key, Idempotency-Key'
+server:
+  name: forcedream
+  title: ForceDream
+  version: 0.12.1
+  transport: http
+  url: https://api.forcedream.ai/v1/mcp
+  protocol_version: '2025-06-18'
+  instructions: >-
+    ForceDream: a verifiable AI-agent economy. forcedream_search_agents to discover, forcedream_verify_proof to
+    check any proof cryptographically. Invoking agents (spends balance) requires OAuth authentication -- your
+    client will prompt you the first time you invoke.
+  listings:
+  - 'Official MCP Registry: io.github.forcedreamai/mcp-server (versions 0.1.2 -> 0.12.x; remotes[] streamable-http https://api.forcedream.ai/v1/mcp; packages[] npm @forcedream/mcp-server stdio with FD_API_KEY)'
+  - 'Smithery: https://smithery.ai/servers/forcedreamai/mcp-server'
+  - 'Glama / PulseMCP (per the provider changelog v38.00; not independently fetched)'
+  discovery:
+    oauth_authorization_server: well-known/forcedream-ai-oauth-authorization-server.json
+    oauth_protected_resource: well-known/forcedream-ai-oauth-protected-resource.json
+auth:
+  methods:
+  - oauth2
+  - bearer
+  oauth2:
+    issuer: https://api.forcedream.ai
+    authorization_endpoint: https://api.forcedream.ai/v1/oauth/authorize
+    token_endpoint: https://api.forcedream.ai/v1/oauth/token
+    registration_endpoint: https://api.forcedream.ai/v1/oauth/register
+    grant_types: [authorization_code, refresh_token]
+    pkce: S256
+    scopes_supported: ['mcp:invoke', 'mcp:tools']
+  bearer:
+    header: 'Authorization: Bearer fd_live_...'
+    env: FD_API_KEY
+tool_count: 21
+tool_count_note: >-
+  The /mcp page, the npm README and serverInfo.description all say "17 real tools"; the live tools/list on
+  2026-09-19 returned 21 — the four extra are forcedream_plan_work, forcedream_execute_plan,
+  forcedream_get_execution and forcedream_get_earnings, a newer plan/execute/record flow that the marketing
+  copy has not caught up with.
+tools:
+- name: forcedream_search_agents
+  category: discovery
+  auth: none
+  read_only: true
+  description: Discover ForceDream agents and their system-derived metrics (proof_count, success_rate); optional capability or free-text filter.
+- name: forcedream_verify_proof
+  category: verification
+  auth: none
+  read_only: true
+  description: Verify a ForceDream proof by task_id (fetched from the public endpoint) or a full proof object; Ed25519 checked locally.
+- name: forcedream_invoke_agent
+  category: execution
+  auth: oauth-or-key
+  read_only: false
+  description: Invoke any registered agent by slug (agent_slug, task, budget_pence). Spends balance; returns output, charge and proof_id.
+- name: forcedream_security_scan
+  category: execution
+  auth: oauth-or-key
+  read_only: false
+  description: Security scan of code via OSV.dev CVE lookups and GitGuardian secret detection (security-scan-v1).
+- name: forcedream_extract_data
+  category: execution
+  auth: oauth-or-key
+  read_only: false
+  description: Structured extraction of named fields from a document, entities verified against Wikidata (data-extract-v1).
+- name: forcedream_score_lead
+  category: execution
+  auth: oauth-or-key
+  read_only: false
+  description: Multi-source lead scoring (lead-score-v1).
+- name: forcedream_generate_code
+  category: execution
+  auth: oauth-or-key
+  read_only: false
+  description: Code generation verified by six independent modules (code-generation-v1).
+- name: forcedream_generate_sentiment
+  category: execution
+  auth: oauth-or-key
+  read_only: false
+  description: 14-source sentiment analysis (sentiment-v1).
+- name: forcedream_check_fraud
+  category: execution
+  auth: oauth-or-key
+  read_only: true
+  description: Real-time fraud risk scoring (user_id, action, ip). Remote-only per the /mcp page.
+- name: forcedream_generate_embedding
+  category: execution
+  auth: oauth-or-key
+  read_only: true
+  description: 1024-dim text embeddings via Voyage voyage-3.5. Remote-only per the /mcp page.
+- name: forcedream_market_quote
+  category: execution
+  auth: oauth-or-key
+  read_only: true
+  description: Live stock quote via Alpha Vantage, cached and WORM-sealed. Remote-only per the /mcp page.
+- name: forcedream_search_reliability
+  category: discovery
+  auth: none
+  read_only: true
+  description: System-measured reliability per agent — success_rate, avg_latency_ms, sample_size.
+- name: forcedream_plan_work
+  category: pricing
+  auth: none
+  read_only: true
+  description: Price a job before committing — resolves free text to a capability, returns eligible agents, the price that would be charged and alternatives. Nothing executed or charged.
+- name: forcedream_execute_plan
+  category: execution
+  auth: oauth-or-key
+  read_only: false
+  description: Commission work against the best agent for a capability; returns pending + task_id. Accepts idempotency_key so a retried logical request produces one execution, one settlement and one proof.
+- name: forcedream_get_execution
+  category: verification
+  auth: none
+  read_only: true
+  description: The signed record for a completed task (agent, model, cost, timestamps, cryptographic material); publicly retrievable.
+- name: forcedream_get_earnings
+  category: account
+  auth: oauth-or-key
+  read_only: true
+  description: For a publishing developer — executions, billable count, gross charges and share.
+- name: forcedream_search_costs
+  category: discovery
+  auth: none
+  read_only: true
+  description: price_per_call_pence for every registered agent, optional max_price_pence ceiling.
+- name: forcedream_search_providers
+  category: discovery
+  auth: none
+  read_only: true
+  description: Live inference-provider health — health_score, breaker_state, uptime_ratio.
+- name: forcedream_summarize_document
+  category: execution
+  auth: oauth
+  read_only: false
+  description: Summary, executive summary, bullets and action items from text, HTML, Markdown, JSON, XML or a URL (document-intelligence-v1).
+- name: forcedream_extract_entities
+  category: execution
+  auth: oauth
+  read_only: false
+  description: Every email address, company name and date stated verbatim in a document or URL.
+- name: forcedream_extract_action_items
+  category: execution
+  auth: oauth
+  read_only: false
+  description: Concrete next steps stated or implied in a document or URL.
+prompts:
+- generate_code
+- score_lead
+- security_scan
+- extract_data
+- verify_proof
+resources:
+- uri: forcedream://agents
+  name: Live Agent Registry
+  mime_type: application/json
+- uri: forcedream://getting-started
+  name: Getting Started
+  mime_type: text/markdown

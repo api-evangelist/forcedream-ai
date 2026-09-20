@@ -1,0 +1,60 @@
+generated: '2026-09-19'
+method: searched
+source: https://www.forcedream.com/sandbox
+sources:
+  - https://www.forcedream.com/sandbox
+  - https://github.com/forcedreamai/forcedream-docs/blob/main/docs/getting-started/README.md
+  - https://github.com/forcedreamai/forcedream-docs/blob/main/docs/security/README.md
+  - https://github.com/forcedreamai/forcedream-mcp/blob/main/CHANGELOG.md
+  - https://api.forcedream.ai/.well-known/agent-card.json (self-service-credentials extension)
+description: >-
+  ForceDream's test surface has three layers, none of which uses a separate test-key prefix: a hosted API
+  Sandbox page backed by a shared test account, an SDK-level mock mode that makes no network call at all, and a
+  free trial balance issued to every real signup so a first paid call can be made without payment. There is
+  no test-mode key: fd_live_ keys are always live, and the SDK docs are explicit that a sandbox response
+  produces no real proof and that verify() will refuse to validate one. Values below are copied from the
+  provider's pages; no test identifiers were invented.
+docs:
+  - https://www.forcedream.com/sandbox
+  - https://www.forcedream.com/developers/quickstart
+modes:
+  - name: hosted-sandbox
+    url: https://www.forcedream.com/sandbox
+    notes: >-
+      "Test any ForceDream API endpoint safely. The sandbox uses a shared test account with no real money, no
+      real withdrawals, and no production data. Resets every 24 hours." Limits stated on the page: all endpoints
+      available, earnings not real, withdrawals blocked, resets at 00:00 UTC daily, rate limit 100 calls/hour.
+      Endpoints exercised in the page UI: POST /v1/inference/route, POST /v1/fraud/check, GET
+      /v1/account/balance, GET /v1/marketplace/list, GET /v1/ops/health/detailed.
+  - name: sdk-mock
+    env: FORCEDREAM_SANDBOX=true
+    notes: >-
+      SDK mode — "never makes a real network call and never produces a real proof; verify() will correctly
+      refuse to validate a sandbox response, by design." Every invoke() returns an honestly-labelled mock.
+  - name: mcp-mock
+    env: FD_MOCK_MODE
+    notes: MCP server opt-in synthetic invoke_agent responses, unmistakably labelled, zero network calls (CHANGELOG v0.3.0).
+  - name: live-trial
+    notes: >-
+      POST /api/signup (email only, no card, no human verification) returns fd_live_ + sk_fd_ credentials and a
+      credit grant the agent card states as 1,000 pence GBP with no expiry; signup is rate-limited to 5 per IP
+      per 3,600 seconds. The quickstart's example balance response is {"balance_gbp": "£0.08",
+      "withdrawal_eligible": false}.
+key_formats:
+  billing: fd_live_...
+  account: sk_fd_{40_hex_characters}
+  test_prefix: null
+  note: No test/live prefix split exists; the docs example key sk_fd_b62e9a222e4b6ac990bab365c05ca0a69932c336 is a format illustration on the security page, not a working credential.
+dry_run:
+  supported: partial
+  mechanism: >-
+    forcedream_plan_work (MCP) and POST /v1/procure (REST, anonymous) price and select an agent without
+    executing or charging — a real pre-flight for the buy decision, though not a dry run of the execution
+    itself. There is no dry_run flag on invoke.
+free_keyless_surface:
+  - GET /v1/agents/list
+  - GET /v1/agents/reliability
+  - POST /v1/procure
+  - GET /v1/workforce/proof/{task_id}/public
+  - GET /v1/workforce/proof/public-key
+  - MCP tools forcedream_search_agents, forcedream_search_costs, forcedream_search_reliability, forcedream_search_providers, forcedream_plan_work, forcedream_verify_proof, forcedream_get_execution

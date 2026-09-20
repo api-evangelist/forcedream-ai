@@ -1,23 +1,273 @@
 aid: forcedream-ai
 name: ForceDream
-description: 'ForceDream is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry)
-  and added to the network as a stub for full-pipeline profiling.'
+description: >-
+  ForceDream Ltd (UK Company No. 17057770, London) operates a paid, verifiable AI-agent marketplace it calls
+  the ForceDream Intelligence OS: specialist agents for summarisation, structured-data extraction, code
+  generation, security scanning, lead scoring, translation, classification, sentiment and forecasting, each
+  priced per call in GBP pence, with 78% of the margin routed to the agent's developer and every completed
+  execution Ed25519-signed so a third party can verify what ran, which model served it and what it cost
+  without an account. The same catalogue is reachable three ways: a REST API on api.forcedream.ai (an
+  8-operation, SDK-verified OpenAPI 3.1 published on GitHub; a 206-route reference on the docs site), a remote
+  Model Context Protocol server at https://api.forcedream.ai/v1/mcp that answers an anonymous tools/list with
+  21 tools (5 keyless) and gates paid tools behind OAuth 2.1 + PKCE with RFC 7591 dynamic client
+  registration, and an A2A 1.0 agent card at /.well-known/agent-card.json declaring 18 skills. Twelve
+  first-party SDKs, a Go CLI, a Homebrew tap and a documented webhook surface round out the developer
+  program.
 url: https://raw.githubusercontent.com/api-evangelist/forcedream-ai/refs/heads/main/apis.yml
+image: https://www.forcedream.com/icon-512.png
 x-type: company
 x-source: harvest:a2a-registry
-x-tier: stub
-x-tier-reason: harvest
+x-tier: profiled
+x-tier-reason: enrichment pass 2026-09-19 (local-v3; was a2a-registry harvest stub)
 specificationVersion: '0.20'
 created: '2026-09-19'
 modified: '2026-09-19'
 tags:
-- Company
-apis: []
+- AI Agents
+- Agent Marketplace
+- MCP
+- A2A
+- Cryptographic Proofs
+- AI Inference Routing
+- Agent Payments
+- Agent Commerce
+- agent-native
+- United Kingdom
+tags_raw:
+- AI agents
+- Agent marketplace
+- MCP
+- A2A
+- Cryptographic proofs
+- AI inference routing
+- Agent payments
+- Agent commerce
+- Agent-native
+- United Kingdom
+apis:
+- aid: forcedream-ai:forcedream-api
+  name: ForceDream API
+  description: >-
+    The REST surface of the ForceDream agent marketplace on https://api.forcedream.ai. The machine-readable
+    contract is the provider's own "SDK-verified surface" OpenAPI 3.1.0 (github.com/forcedreamai/forcedream-openapi,
+    MIT): 8 operations covering self-service signup (POST /api/signup returns an fd_live_ billing key and an
+    sk_fd_ account key plus a trial balance), account balance, agent discovery (GET /v1/agents/list) and
+    measured reliability (GET /v1/agents/reliability), asynchronous invocation (POST /v1/agents/{slug}/invoke
+    then GET /v1/agents/{slug}/result/{taskId}), and public Ed25519 proof retrieval and the signing public key.
+    Every one of those routes was confirmed live on api.forcedream.ai during profiling. The docs site's API
+    reference lists a much larger 206-route platform surface (inference routing, memory, marketplace,
+    payments, wallet, fraud, WORM audit, compliance, enterprise, broker, cloud) for which no machine-readable
+    contract is published; the openapi.json served at the root of forcedream.ai/api.forcedream.ai/
+    forcedream.com is a different, 15-route "ForceDream Data Oracle" document whose servers[] is an ngrok
+    placeholder and whose /v1/oracle/* routes 404 on the live host, so it is deliberately not wired here.
+  humanURL: https://www.forcedream.com/developers/api
+  image: https://www.forcedream.com/icon-512.png
+  baseURL: https://api.forcedream.ai
+  tags:
+  - AI Agents
+  - Agent Marketplace
+  - Cryptographic Proofs
+  - Agent Payments
+  properties:
+  - type: OpenAPI
+    url: openapi/forcedream-ai-openapi.yml
+  - type: OpenAPI
+    name: ForceDream API OpenAPI 3.1 (provider-hosted, GitHub)
+    url: https://raw.githubusercontent.com/forcedreamai/forcedream-openapi/main/openapi.yaml
+  - type: Documentation
+    url: https://www.forcedream.com/developers/docs
+  - type: APIReference
+    url: https://www.forcedream.com/developers/api
+  - type: GettingStarted
+    url: https://www.forcedream.com/developers/quickstart
+  - type: Overlay
+    url: overlays/forcedream-ai-openapi-overlay.yaml
+  - type: AsyncAPI
+    url: asyncapi/forcedream-ai-webhooks-asyncapi.yml
+  - type: Webhooks
+    url: asyncapi/forcedream-ai-webhooks-asyncapi.yml
+  - type: Webhooks
+    name: Webhooks documentation
+    url: https://www.forcedream.com/developers/webhooks
+  - type: ErrorCatalog
+    url: errors/forcedream-ai-problem-types.yml
+  - type: RateLimits
+    url: rate-limits/forcedream-ai-rate-limits.yml
+  - type: DataModel
+    url: data-model/forcedream-ai-data-model.yml
+- aid: forcedream-ai:forcedream-mcp-server
+  name: ForceDream MCP Server
+  description: >-
+    Remote Model Context Protocol server at https://api.forcedream.ai/v1/mcp (Streamable HTTP, protocol
+    version 2025-06-18, serverInfo forcedream 0.12.1) with a local stdio twin published to npm as
+    @forcedream/mcp-server (0.12.2) and listed in the official MCP Registry as io.github.forcedreamai/mcp-server.
+    initialize, tools/list, prompts/list and resources/list all answer anonymously: 21 tools with real
+    inputSchema (the /mcp page and serverInfo still say 17), 5 prompts and 2 resources. Discovery, pricing,
+    reliability, provider health, plan_work and proof verification need no credential; tools that spend
+    balance return JSON-RPC -32001 authentication_required with a machine-readable self-service credential
+    acquisition block, and are authorised with a bearer fd_live_ key or OAuth 2.1 + PKCE (RFC 8414 metadata,
+    RFC 9728 protected-resource metadata, RFC 7591 dynamic client registration, scopes mcp:invoke and
+    mcp:tools). forcedream_execute_plan takes an idempotency_key.
+  humanURL: https://forcedream.ai/mcp
+  image: https://www.forcedream.com/icon-512.png
+  baseURL: https://api.forcedream.ai/v1/mcp
+  tags:
+  - MCP
+  - agent-native
+  - AI Agents
+  properties:
+  - type: MCPServer
+    url: mcp/forcedream-ai-mcp.yml
+  - type: MCPServer
+    name: ForceDream MCP endpoint (Streamable HTTP)
+    url: https://api.forcedream.ai/v1/mcp
+  - type: ToolCrosswalk
+    url: mcp/forcedream-ai-tool-crosswalk.yml
+  - type: Documentation
+    url: https://forcedream.ai/mcp
+  - type: SourceCode
+    url: https://github.com/forcedreamai/forcedream-mcp
+- aid: forcedream-ai:forcedream-a2a-agent
+  name: ForceDream A2A Agent
+  description: >-
+    Agent2Agent (A2A) protocol surface: a signed (ES256 JWS, kid in /.well-known/jwks.json) agent card served
+    from https://api.forcedream.ai/.well-known/agent-card.json and mirrored on forcedream.ai and at the legacy
+    /.well-known/agent.json path, protocolVersion 1.0, JSONRPC transport, 18 skills (research:citation,
+    coding, code:review, data:extraction, summarization, translation, classification, sentiment,
+    sales:lead-scoring, compliance:audit, analytics:forecast and more). The JSON-RPC endpoint
+    https://api.forcedream.ai/v1/a2a/execute answers message/send; per-agent cards live at
+    /v1/.well-known/agents/{slug}/agent-card.json. The card declares an A2UI extension, a Gemini Enterprise
+    dynamic-client-registration extension and a published self-service-credentials extension describing how
+    an agent obtains a bearer key without a human step. Security is bearerAuth or oauth2 with scope
+    agent.execute.
+  humanURL: https://www.forcedream.com/a2a
+  image: https://www.forcedream.com/icon-512.png
+  baseURL: https://api.forcedream.ai/v1/a2a/execute
+  tags:
+  - A2A
+  - agent-native
+  - AI Agents
+  properties:
+  - type: AgentCard
+    url: a2a/forcedream-ai-a2a.yml
+  - type: AgentCard
+    name: A2A Agent Card (provider-hosted)
+    url: https://api.forcedream.ai/.well-known/agent-card.json
+  - type: Documentation
+    url: https://github.com/forcedreamai/forcedream-a2a-agent
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
 common:
+- type: TrustCenter
+  url: security/forcedream-ai-trust-center.yml
+- type: VulnerabilityDisclosure
+  url: security/forcedream-ai-vulnerability-disclosure.yml
+- type: DomainSecurity
+  url: security/forcedream-ai-domain-security.yml
+- type: Authentication
+  url: authentication/forcedream-ai-authentication.yml
 - type: Website
   url: https://forcedream.ai/
+- type: DeveloperPortal
+  url: https://www.forcedream.com/developers
+- type: Documentation
+  url: https://www.forcedream.com/developers/docs
+- type: APIReference
+  url: https://www.forcedream.com/developers/api
+- type: GettingStarted
+  url: https://www.forcedream.com/developers/quickstart
+- type: Support
+  url: https://www.forcedream.com/contact
+- type: Blog
+  url: https://www.forcedream.com/blog
+- type: BlogRSS
+  url: https://www.forcedream.com/blog/feed.xml
+- type: GitHubOrganization
+  url: https://github.com/forcedreamai
+- type: Pricing
+  url: https://www.forcedream.com/pricing
+- type: SignUp
+  url: https://www.forcedream.com/earn
+- type: TermsOfService
+  url: https://www.forcedream.com/terms
+- type: PrivacyPolicy
+  url: https://www.forcedream.com/privacy
+- type: StatusPage
+  url: https://www.forcedream.com/status
+- type: ChangeLog
+  url: https://www.forcedream.com/changelog
+- type: ChangeLog
+  url: changelog/forcedream-ai-changelog.yml
+- type: TrustCenter
+  url: https://www.forcedream.com/trust
+- type: Sandbox
+  url: https://www.forcedream.com/sandbox
+- type: Sandbox
+  url: sandbox/forcedream-ai-sandbox.yml
+- type: LLMsTxt
+  url: llms/forcedream-ai-llms.txt
+- type: LLMsTxt
+  name: llms.txt (provider-hosted)
+  url: https://forcedream.ai/llms.txt
+- type: WellKnown
+  url: well-known/forcedream-ai-well-known.yml
+- type: SecurityTxt
+  url: well-known/forcedream-ai-security.txt
+- type: AgentCard
+  url: a2a/forcedream-ai-a2a.yml
+- type: MCPServer
+  url: mcp/forcedream-ai-mcp.yml
+- type: ToolCrosswalk
+  url: mcp/forcedream-ai-tool-crosswalk.yml
+- type: Packages
+  url: packages/forcedream-ai-packages.yml
+- type: SDKs
+  url: packages/forcedream-ai-packages.yml
+- type: CLI
+  url: cli/forcedream-ai-cli.yml
+- type: Conventions
+  url: conventions/forcedream-ai-conventions.yml
+- type: Idempotency
+  url: conventions/forcedream-ai-conventions.yml
+- type: ErrorCatalog
+  url: errors/forcedream-ai-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/forcedream-ai-lifecycle.yml
+- type: Deprecation
+  url: lifecycle/forcedream-ai-lifecycle.yml
+- type: Conformance
+  url: conformance/forcedream-ai-conformance.yml
+- type: DataModel
+  url: data-model/forcedream-ai-data-model.yml
+- type: Plans
+  url: plans/forcedream-ai-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/forcedream-ai-rate-limits.yml
+- type: AsyncAPI
+  url: asyncapi/forcedream-ai-webhooks-asyncapi.yml
+- type: Webhooks
+  url: asyncapi/forcedream-ai-webhooks-asyncapi.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Subprocessors
+  url: https://www.forcedream.com/trust/subprocessors
+- type: DataSubjectRequest
+  url: https://www.forcedream.com/privacy
+- type: DataResidency
+  url: https://www.forcedream.com/trust/enterprise
+- type: ExitAssistance
+  url: https://www.forcedream.com/trust/developer
+- type: Security
+  url: security/forcedream-ai-vulnerability-disclosure.yml
+- type: Compliance
+  url: security/forcedream-ai-trust-center.yml
+- type: OAuthScopes
+  url: scopes/forcedream-ai-scopes.yml
+x-enrichment:
+  date: '2026-09-19'
+  status: enriched
+  artifacts_added: 38
+  pass: local-v3

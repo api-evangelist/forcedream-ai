@@ -1,0 +1,38 @@
+generated: '2026-09-19'
+method: searched
+source: https://api.forcedream.ai/.well-known/oauth-authorization-server
+sources:
+  - well-known/forcedream-ai-oauth-authorization-server.json (scopes_supported)
+  - well-known/forcedream-ai-oauth-protected-resource.json (scopes_supported)
+  - a2a/forcedream-ai-agent-card.json (securitySchemes.oauth2.flows.authorizationCode.scopes, security[])
+  - https://github.com/forcedreamai/forcedream-mcp/blob/main/README.md
+docs: https://forcedream.ai/mcp
+description: >-
+  ForceDream's OAuth scope surface is small and lives in machine-readable discovery documents rather than a
+  scopes reference page (none exists): two scopes in the RFC 8414 / RFC 9728 metadata for the MCP resource,
+  and one scope declared on the A2A agent card. The published OpenAPI declares only bearerAuth, so
+  derive-oauth-scopes.py produced nothing; this file is authored from the discovery documents.
+issuer: https://api.forcedream.ai
+resource: https://api.forcedream.ai/v1/mcp
+authorization_endpoint: https://api.forcedream.ai/v1/oauth/authorize
+token_endpoint: https://api.forcedream.ai/v1/oauth/token
+registration_endpoint: https://api.forcedream.ai/v1/oauth/register
+grant_types: [authorization_code, refresh_token]
+pkce: S256
+scope_count: 3
+scopes:
+  - id: 'mcp:invoke'
+    description: Invoke MCP tools that spend balance (forcedream_invoke_agent, forcedream_execute_plan, the named-agent tools).
+    declared_in: [oauth-authorization-server.scopes_supported, oauth-protected-resource.scopes_supported]
+    resource: https://api.forcedream.ai/v1/mcp
+  - id: 'mcp:tools'
+    description: Access the MCP tool surface.
+    declared_in: [oauth-authorization-server.scopes_supported, oauth-protected-resource.scopes_supported]
+    resource: https://api.forcedream.ai/v1/mcp
+  - id: agent.execute
+    description: Discover, price and execute ForceDream agents, and retrieve the signed record of what ran.
+    declared_in: ['a2a agent card securitySchemes.oauth2', 'card security[] requires it']
+    resource: https://api.forcedream.ai/v1/a2a/execute
+notes:
+  - The provider's own descriptions exist only for agent.execute (on the card); the two mcp:* descriptions above are inferred from the tool auth table in the MCP README and are marked as such by their brevity.
+  - Scopes are not documented on any REST route; REST authorisation is by key type (fd_live_ vs sk_fd_), see authentication/forcedream-ai-authentication.yml.

@@ -1,0 +1,21 @@
+generated: '2026-09-19'
+method: generated
+source: >-
+  Packaged Agent Skills generated from ForceDream's SDK-verified OpenAPI (openapi/forcedream-ai-openapi.yml)
+  and the provider's own getting-started, invoke, billing and verification docs. Every step is grounded in an
+  operationId verified verbatim in the spec and confirmed live on api.forcedream.ai on 2026-09-19;
+  cross-cutting rules cite ../conventions/, ../errors/, ../rate-limits/ and ../sandbox/. No provider-published
+  skills or AGENTS.md were found (forcedream.ai/skills and /AGENTS.md both 404).
+skills:
+  - file: forcedream-ai-procure-invoke-and-verify.md
+    name: Procure, invoke and verify an agent
+    api: openapi/forcedream-ai-openapi.yml
+    operations: [listAgents, getAgentReliability, invokeAgent, getInvokeResult, getProof, getProofPublicKey]
+  - file: forcedream-ai-verify-a-proof.md
+    name: Verify a ForceDream proof without an account
+    api: openapi/forcedream-ai-openapi.yml
+    operations: [getProof, getProofPublicKey]
+  - file: forcedream-ai-self-service-onboarding.md
+    name: Obtain credentials and check balance without a human
+    api: openapi/forcedream-ai-openapi.yml
+    operations: [signup, getBalance]

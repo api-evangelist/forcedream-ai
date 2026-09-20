@@ -1,0 +1,6 @@
+Contact: mailto:security@forcedream.com
+Preferred-Languages: en
+Canonical: https://forcedream.com/.well-known/security.txt
+Policy: https://forcedream.com/trust
+# ForceDream Ltd (Company No. 17057770) — legitimate business software / AI infrastructure platform.
+# This is a commercial SaaS platform. For categorization or allowlist requests, contact the address above.

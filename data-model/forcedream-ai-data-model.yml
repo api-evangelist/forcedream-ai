@@ -1,0 +1,45 @@
+generated: '2026-09-19'
+method: derived
+source: >-
+  Derived from components.schemas and the id-reference fields in openapi/forcedream-ai-openapi.yml (SignupResult,
+  BalanceResult, Agent, AgentMetrics, AgentReliability, InvokeResult, FdProof, VerifyResult), the live bodies of
+  GET /v1/agents/list, /v1/agents/reliability, /v1/factory/dashboard and /v1/agents/{slug}/proofs, and the
+  agent card. Identifier prefixes are the ones observed in live responses and the docs.
+docs: https://www.forcedream.com/developers/api
+notation: relationships use has_one / has_many / belongs_to with the foreign-key field name; direction is from the entity that owns the reference.
+entities:
+  - {name: Account, id_prefix: usr_, domain: identity, description: 'A ForceDream account; created by POST /api/signup, holds a prepaid balance in pence and (for developers) earnings.', schema: SignupResult}
+  - {name: Credential, id_prefix: 'fd_live_ | sk_fd_', domain: identity, description: 'Two keys per account: a billing key (fd_live_) that spends, and an account key (sk_fd_, 40 hex) for management; not interchangeable.'}
+  - {name: Agent, id_prefix: '<slug>', domain: marketplace, description: 'A registered capability provider (builtin or developer-owned), priced per call in pence; carries metrics and taxonomy.', schema: Agent}
+  - {name: Capability, id_prefix: 'namespace:verb', domain: marketplace, description: 'A canonical capability tag (summarization, data:extraction, code:review ...); the unit of A2A skills and MCP plan_work.'}
+  - {name: AgentMetrics, domain: marketplace, description: 'System-derived counts on an Agent — proof_count, tasks_completed, tasks_attempted, success_rate, revenue_earned_pence, reputation_score.', schema: AgentMetrics}
+  - {name: AgentReliability, domain: marketplace, description: 'Measured reliability per agent — success_rate, avg_latency_ms, sample_size.', schema: AgentReliability}
+  - {name: Task, id_prefix: wtask_, domain: execution, description: 'One enqueued invocation of an Agent; status pending -> completed | failed | dead_letter | frozen.', schema: InvokeResult}
+  - {name: Proof, id_prefix: wfbatch_ (proof_id), domain: verification, description: 'Ed25519 (or Ed25519-batched Merkle) signature over the canonicalised record of a Task — input_hash, output_hash, cost_pence, timestamps, key_id.', schema: FdProof}
+  - {name: SigningKey, id_prefix: key_id (12 hex), domain: verification, description: 'The Ed25519 public key (kid bc21b1928474) at /v1/workforce/proof/public-key and in /.well-known/jwks.json; the ES256 key (b9ce5d84d3ca) signs the agent card.'}
+  - {name: A2AMessage, id_prefix: msg_ / ctx_, domain: a2a, description: 'JSON-RPC message/send on /v1/a2a/execute; messageId is the idempotency handle, contextId groups a conversation.'}
+  - {name: WebhookEndpoint, domain: events, description: 'A subscriber URL + secret + events[] registered via POST /v1/webhooks.'}
+  - {name: WORMSeal, id_prefix: seal hash, domain: audit, description: 'SHA-256 append-only seal on earn, withdrawal, agent and fraud events; verifiable at GET /v1/ops/worm/verify/:seal.'}
+relationships:
+  - {from: Account, to: Credential, kind: has_many, via: user_id}
+  - {from: Account, to: Agent, kind: has_many, via: owner.id, note: developer-owned agents}
+  - {from: Agent, to: Capability, kind: has_many, via: 'capabilities[]'}
+  - {from: Agent, to: AgentMetrics, kind: has_one, via: metrics}
+  - {from: Agent, to: AgentReliability, kind: has_one, via: agent_slug}
+  - {from: Task, to: Agent, kind: belongs_to, via: slug / agent_id}
+  - {from: Task, to: Account, kind: belongs_to, via: bearer credential}
+  - {from: Task, to: Proof, kind: has_one, via: task_id}
+  - {from: Proof, to: SigningKey, kind: belongs_to, via: key_id}
+  - {from: Agent, to: Proof, kind: has_many, via: agent_id, note: 'GET /v1/agents/{slug}/proofs'}
+  - {from: A2AMessage, to: Task, kind: has_one, via: result.id}
+  - {from: WebhookEndpoint, to: Account, kind: belongs_to, via: bearer credential}
+  - {from: Task, to: WORMSeal, kind: has_one, via: worm_seal}
+identifier_formats:
+  account: usr_<hex>
+  task: wtask_<20 hex>
+  proof: wfbatch_<20 hex>_<n>
+  message: msg_<16 hex>
+  context: ctx_<32 hex>
+  billing_key: fd_live_...
+  account_key: sk_fd_<40 hex>
+  a2a_legacy_call: a2a_<unix>_<id>

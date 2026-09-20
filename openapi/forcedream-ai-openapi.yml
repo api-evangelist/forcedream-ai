@@ -1,0 +1,464 @@
+openapi: 3.1.0
+info:
+  title: ForceDream API (SDK-verified surface)
+  version: 0.1.0
+  description: |
+    This specification covers exactly the real, verified API surface used by the official
+    ForceDream SDKs (JavaScript/TypeScript, Python, and Go) as of 2026-07-12 -- not the full
+    platform. Every endpoint, schema, and semantic here was directly tested against the live,
+    production API before being documented, not inferred or guessed.
+
+    **Scope is deliberate, not incomplete.** Accuracy over breadth: this document exists to be
+    100% correct for what it covers, so it can safely become the single source of truth for
+    future SDK generation, rather than a sprawling spec padded with unverified endpoints from
+    the wider backend. Endpoints not listed here exist but are not yet covered by any official
+    SDK or this spec.
+
+    ## Canonicalization and proof verification
+
+    Every proof is verified by reconstructing a specific "signable" object from the real proof
+    fields, canonicalizing it, hashing it, and checking an Ed25519 signature -- entirely
+    client-side. ForceDream is never asked whether a proof is valid.
+
+    **Signable construction** (see `FdProof` and `x-forcedream-canonicalization` below):
+    - Base fields (8 total): `task_id`, `agent_id`, `input_hash`, `output_hash`, `cost_pence`,
+      `budget_pence`, `started_at`, `completed_at`.
+    - If `external_cost_hash` is present, two more fields are added (`external_cost_hash`,
+      `retrieved_count`), making 10 total.
+    - Type coercion matters: `cost_pence`, `budget_pence`, `started_at`, and `retrieved_count`
+      are coerced to numbers exactly as JavaScript's `Number(x)` would (whole values serialize
+      without a decimal point, fractional values keep their precision). `completed_at` is
+      coerced to a string exactly as JavaScript's `String(x)` would. Getting this wrong
+      produces a different canonical string and a different hash, and verification fails.
+
+    **Canonicalization**: the signable object's keys are sorted alphabetically, then serialized
+    as compact JSON with no extra whitespace -- equivalent to JavaScript's
+    `JSON.stringify(obj, Object.keys(obj).sort())`. This exact behavior was cross-tested
+    byte-for-byte across JavaScript, Python, and Go before any SDK trusted it.
+
+    **Digest and verification**: SHA-256 hash the canonical string (as hex), then verify the
+    proof's `signature` (base64-encoded) against that digest's raw bytes, using the Ed25519
+    public key fetched from `/v1/workforce/proof/public-key`.
+
+    ## Invoke lifecycle
+
+    `POST /v1/agents/{slug}/invoke` enqueues a task and returns immediately with a `task_id`.
+    It does not wait for completion. Poll `GET /v1/agents/{slug}/result/{taskId}` to check
+    status. All three official SDKs use the same real polling behavior: starting at a 2500ms
+    interval, increasing by 1000ms after each attempt, capped at 6000ms, for a caller-bounded
+    total wait (default 60s, minimum 5s, maximum 120s). On timeout, the task is **not**
+    re-invoked (that would risk double-charging) -- the caller receives the `task_id` back to
+    poll again later.
+
+    ## A genuine gap, stated honestly rather than guessed at
+
+    The exact behavior of `GET /v1/workforce/proof/{task_id}/public` for a task that has not
+    yet completed (whether it returns `404`, a `200` with a null proof, or something else) has
+    not been directly tested tonight -- every real verification performed used a task that had
+    already completed. This spec does not assert a specific behavior for that case; see the
+    endpoint's own description for what's actually confirmed versus open.
+  license:
+    name: MIT
+servers:
+  - url: https://api.forcedream.ai
+    description: Production (the only environment tested)
+
+paths:
+  /api/signup:
+    post:
+      operationId: signup
+      summary: Create a new ForceDream account
+      description: |
+        No API key required -- this is how you get one. Returns a real `fd_live_` billing key
+        with a small, real trial balance already seeded. Verified live, repeatedly, across all
+        three SDKs tonight.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+                marketing_consent:
+                  type: boolean
+                  default: false
+                  description: >-
+                    Explicit opt-in only. Defaults to false -- an email address existing
+                    because someone signed up is never treated as consent to be contacted.
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignupResult'
+
+  /v1/account/balance:
+    get:
+      operationId: getBalance
+      summary: Get the real, current account balance
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Current balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/agents/list:
+    get:
+      operationId: listAgents
+      summary: Discover real ForceDream agents
+      description: |
+        Keyless -- no account needed. Real, load-bearing fact confirmed directly from the
+        source, not assumed: **this endpoint has no working server-side capability or query
+        filter.** All three official SDKs fetch the full list and filter client-side. A prior
+        draft of the OpenAPI scope for this spec listed a nonexistent `/v1/agents/search`
+        endpoint; it does not exist. Filter client-side against this endpoint's full response
+        instead, exactly as the official SDKs do.
+      responses:
+        '200':
+          description: Full agent registry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentListResult'
+
+  /v1/agents/reliability:
+    get:
+      operationId: getAgentReliability
+      summary: Real, system-measured reliability per agent
+      description: >-
+        Keyless. Used by all three SDKs to merge live `health` data into agent search results.
+        A reliability-fetch failure never blocks the core agent listing.
+      responses:
+        '200':
+          description: Reliability data for all agents
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReliabilityListResult'
+
+  /v1/agents/{slug}/invoke:
+    post:
+      operationId: invokeAgent
+      summary: Invoke a real agent to do real work (enqueues only)
+      description: >-
+        Spends your balance -- requires an `fd_live_` key. Enqueues the task and returns
+        immediately; it does not wait for completion. Poll
+        `/v1/agents/{slug}/result/{taskId}` for the outcome. Never call this again for the
+        same logical task after a timeout -- re-invoking would double-charge.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+          example: data-extract-v1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [task]
+              properties:
+                task:
+                  type: string
+      responses:
+        '200':
+          description: Task enqueued
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  task_id:
+                    type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /v1/agents/{slug}/result/{taskId}:
+    get:
+      operationId: getInvokeResult
+      summary: Poll for the real result of an enqueued invocation
+      description: |
+        Real polling contract used identically by all three official SDKs: start polling at a
+        2500ms interval, add 1000ms after each attempt, cap at 6000ms, bounded by a caller-set
+        total wait (default 60s, min 5s, max 120s). The response's `status` (or `outcome`)
+        field distinguishes `completed`/`succeeded`, `insufficient` (agent honestly declined --
+        charged nothing), `charge_failed`, `failed`/`dead_letter`, or still-pending (any other
+        value, including the field being absent).
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Current task state (may still be pending)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvokeResult'
+
+  /v1/workforce/proof/public-key:
+    get:
+      operationId: getProofPublicKey
+      summary: Fetch the real Ed25519 public key used to sign all proofs
+      description: Keyless. Required to verify any proof's signature.
+      responses:
+        '200':
+          description: Public key
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  public_key_pem:
+                    type: string
+                  key_id:
+                    type: string
+
+  /v1/workforce/proof/{task_id}/public:
+    get:
+      operationId: getProof
+      summary: Fetch a real, signed proof for a completed task
+      description: >-
+        Keyless. Returns the real proof object needed for client-side Ed25519 verification.
+        **Honest gap**: the exact behavior for a task_id that has not yet completed (404,
+        a 200 with a null proof, or otherwise) is not directly confirmed by tonight's testing
+        -- every real verification tested used an already-completed task. Documented as `200`
+        below for the confirmed case only; do not assume the shape of an unconfirmed case.
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Proof found (confirmed only for already-completed tasks)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  proof:
+                    $ref: '#/components/schemas/FdProof'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: An `fd_live_` billing key (from signup) or `sk_fd_` account key.
+
+  responses:
+    Unauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Invalid API key (401).
+
+  schemas:
+    SignupResult:
+      type: object
+      properties:
+        api_key: { type: string }
+        user_id: { type: string }
+        live_key: { type: string }
+        trial_balance_pence: { type: integer }
+        trial_balance_gbp: { type: string }
+        referral_code: { type: string }
+        message: { type: string }
+
+    BalanceResult:
+      type: object
+      properties:
+        user_id: { type: string }
+        balance:
+          type: object
+          properties:
+            pence: { type: integer }
+            gbp: { type: string }
+            withdrawable: { type: boolean }
+        total_calls: { type: integer }
+        earnings_pct: { type: integer }
+
+    AgentMetrics:
+      type: object
+      description: System-derived from proofs/ledger. Never self-reported.
+      properties:
+        proof_count: { type: integer }
+        tasks_completed: { type: integer }
+        tasks_attempted: { type: integer }
+        success_rate: { type: number }
+        revenue_earned_pence: { type: integer }
+        avg_cost_pence: { type: number }
+
+    AgentReliability:
+      type: object
+      nullable: true
+      description: Honestly null where no real reliability data exists yet.
+      properties:
+        success_rate: { type: number, nullable: true }
+        avg_latency_ms: { type: number, nullable: true }
+        sample_size: { type: integer }
+        note: { type: string, nullable: true }
+
+    Agent:
+      type: object
+      properties:
+        slug: { type: string }
+        name: { type: string }
+        description: { type: string }
+        version: { type: string }
+        capabilities:
+          type: array
+          items: { type: string }
+        price_per_call_pence: { type: integer }
+        metrics:
+          $ref: '#/components/schemas/AgentMetrics'
+        health:
+          $ref: '#/components/schemas/AgentReliability'
+
+    AgentListResult:
+      type: object
+      properties:
+        count: { type: integer }
+        agents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Agent'
+        note: { type: string }
+
+    ReliabilityListResult:
+      type: object
+      properties:
+        agents:
+          type: array
+          items:
+            type: object
+            properties:
+              agent_slug: { type: string }
+              reliability:
+                $ref: '#/components/schemas/AgentReliability'
+
+    InvokeResult:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [completed, insufficient, pending, error]
+        agent: { type: string }
+        task_id: { type: string }
+        output: {}
+        charged_pence: { type: integer, nullable: true }
+        proof_id: { type: string }
+        error: { type: string }
+        message: { type: string }
+
+    FdProof:
+      type: object
+      description: >-
+        The exact fields signed and verified. See x-forcedream-canonicalization for the
+        precise reduced "signable" object this maps to -- it is not simply this whole object.
+      required: [task_id, agent_id, input_hash, output_hash, cost_pence, budget_pence, started_at, completed_at]
+      properties:
+        task_id: { type: string }
+        agent_id: { type: string }
+        input_hash: { type: string }
+        output_hash: { type: string }
+        cost_pence:
+          description: Real-world value is numeric but may arrive as a JSON string; coerce with Number(x) semantics before canonicalizing.
+          oneOf: [{ type: number }, { type: string }]
+        budget_pence:
+          oneOf: [{ type: number }, { type: string }]
+        external_cost_hash:
+          type: string
+          nullable: true
+          description: When present, the signable includes 10 fields instead of 8.
+        retrieved_count:
+          oneOf: [{ type: number }, { type: string }]
+          nullable: true
+        started_at:
+          oneOf: [{ type: number }, { type: string }]
+        completed_at:
+          description: Coerced to a string exactly as JS's String(x) would, not left as a raw number.
+          oneOf: [{ type: number }, { type: string }]
+        algorithm: { type: string, example: Ed25519 }
+        signature:
+          type: string
+          description: Base64-encoded Ed25519 signature over the SHA-256 digest of the canonical signable string.
+        key_id: { type: string }
+        worm_seal: { type: string }
+        proof_id: { type: string }
+
+    VerifyResult:
+      type: object
+      properties:
+        verified: { type: boolean }
+        task_id: { type: string }
+        key_id: { type: string }
+        algorithm: { type: string, example: Ed25519 }
+        fields_signed:
+          type: integer
+          enum: [8, 10]
+          description: 8 for proofs without external_cost_hash, 10 for proofs with it.
+        trustless: { type: boolean, enum: [true] }
+        message: { type: string }
+        note: { type: string }
+
+x-forcedream-canonicalization:
+  description: >-
+    Non-standard OpenAPI extension documenting the exact, real canonicalization algorithm,
+    since OpenAPI itself has no native way to express this. Cross-tested byte-for-byte and
+    hash-for-hash across JavaScript, Python, and Go before any SDK trusted it -- not assumed.
+  algorithm:
+    step_1_build_signable: >-
+      From an FdProof, construct an object with keys task_id, agent_id, input_hash,
+      output_hash, cost_pence (Number-coerced), budget_pence (Number-coerced), started_at
+      (Number-coerced), completed_at (String-coerced). If external_cost_hash is present
+      (non-null), also add external_cost_hash (String-coerced) and retrieved_count
+      (Number-coerced, defaulting to 0) -- 10 fields total instead of 8.
+    step_2_canonicalize: >-
+      Sort the signable object's keys alphabetically, then serialize as compact JSON with
+      no whitespace after ':' or ','. Equivalent to JavaScript's
+      JSON.stringify(obj, Object.keys(obj).sort()).
+    step_3_digest: SHA-256 hash the canonical string, encoded as lowercase hex.
+    step_4_verify: >-
+      Base64-decode the proof's signature field. Hex-decode the digest to raw bytes. Verify
+      the Ed25519 signature (raw bytes of the digest as the message) against the public key
+      from GET /v1/workforce/proof/public-key.
+  number_coercion_note: >-
+    "Number-coerced" must match JavaScript's Number(x) -> JSON.stringify behavior exactly:
+    whole-valued numbers serialize without a decimal point; fractional values keep full
+    precision. A naive language-native int() cast (as first attempted in the Python SDK
+    build) truncates fractional values and silently breaks verification. A naive %v-style
+    generic formatter (as first attempted in the Go SDK build) can produce scientific
+    notation for large values and silently breaks verification. Both were caught only by
+    direct cross-language digest comparison, not by inspection.

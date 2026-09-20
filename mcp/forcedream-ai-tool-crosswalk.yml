@@ -1,0 +1,145 @@
+generated: '2026-09-19'
+method: derived
+source: >-
+  Derived by aligning the live MCP tools/list (mcp/forcedream-ai-mcp-tools-list.json, 21 tools with real
+  inputSchema, fetched anonymously from https://api.forcedream.ai/v1/mcp on 2026-09-19) with the provider's
+  SDK-verified OpenAPI 3.1 (openapi/forcedream-ai-openapi.yml, 8 operations), the MCP server source tree
+  (github.com/forcedreamai/forcedream-mcp/src/*.ts) and the docs. Confidence per row.
+purpose: >-
+  Bind each agent-facing MCP tool to the REST operation that backs it, so a tool inherits the operation's real
+  parameters/requestBody as its contract, and record where the two surfaces diverge. For ForceDream the
+  divergence is large in one direction: the OpenAPI deliberately covers only the 8 routes the SDKs use, while
+  the MCP server fans out to named-agent tools and to platform routes (fraud, embeddings, market data,
+  provider health, plan/execute) that the docs describe in prose but no published contract covers.
+surfaces:
+  rest_openapi: openapi/forcedream-ai-openapi.yml      # 8 operations, servers https://api.forcedream.ai; live-verified
+  graphql: null                                        # no GraphQL surface
+  mcp: https://api.forcedream.ai/v1/mcp                # tools/list NOT gated — full inputSchema captured
+  rest_reference: https://www.forcedream.com/developers/api   # 206-route prose reference, no contract published
+
+crosswalk:
+  - tool: forcedream_search_agents
+    category: discovery
+    rest: [listAgents]
+    binding: rest
+    confidence: high
+    note: GET /v1/agents/list; the tool's capability/query filters are applied client-side or via the same route's filters.
+  - tool: forcedream_search_costs
+    category: discovery
+    rest: [listAgents]
+    binding: rest
+    confidence: high
+    note: Projects price_per_call_pence from the same agent list; max_price_pence is a client-side ceiling.
+  - tool: forcedream_search_reliability
+    category: discovery
+    rest: [getAgentReliability]
+    binding: rest
+    confidence: high
+  - tool: forcedream_verify_proof
+    category: verification
+    rest: [getProof, getProofPublicKey]
+    binding: rest
+    confidence: high
+    note: Fetches GET /v1/workforce/proof/{task_id}/public and the key at /v1/workforce/proof/public-key, then verifies Ed25519 locally using the canonicalization in the spec's x-forcedream-canonicalization extension.
+  - tool: forcedream_get_execution
+    category: verification
+    rest: [getProof]
+    binding: rest
+    confidence: medium
+    note: Returns the signed record for a task_id/proof_id; the public proof route is the only documented anonymous source for that record.
+  - tool: forcedream_invoke_agent
+    category: execution
+    rest: [invokeAgent, getInvokeResult]
+    binding: rest
+    confidence: high
+    note: POST /v1/agents/{slug}/invoke then polls GET /v1/agents/{slug}/result/{taskId}; budget_pence maps to the invoke body.
+  - tool: forcedream_security_scan
+    category: execution
+    rest: [invokeAgent, getInvokeResult]
+    binding: rest
+    confidence: medium
+    note: Same route with slug fixed to security-scan-v1 (per the README, "same underlying agents, simpler input shape").
+  - tool: forcedream_extract_data
+    category: execution
+    rest: [invokeAgent, getInvokeResult]
+    binding: rest
+    confidence: medium
+    note: slug data-extract-v1.
+  - tool: forcedream_score_lead
+    category: execution
+    rest: [invokeAgent, getInvokeResult]
+    binding: rest
+    confidence: medium
+    note: slug lead-score-v1.
+  - tool: forcedream_generate_code
+    category: execution
+    rest: [invokeAgent, getInvokeResult]
+    binding: rest
+    confidence: medium
+    note: slug code-generation-v1.
+  - tool: forcedream_generate_sentiment
+    category: execution
+    rest: [invokeAgent, getInvokeResult]
+    binding: rest
+    confidence: medium
+    note: slug sentiment-v1.
+  - tool: forcedream_summarize_document
+    category: execution
+    rest: [invokeAgent, getInvokeResult]
+    binding: rest
+    confidence: medium
+    note: slug document-intelligence-v1 (added in the provider changelog v38.70, 17 Aug 2026).
+  - tool: forcedream_extract_entities
+    category: execution
+    rest: [invokeAgent, getInvokeResult]
+    binding: rest
+    confidence: medium
+    note: document-intelligence-v1 entity mode.
+  - tool: forcedream_extract_action_items
+    category: execution
+    rest: [invokeAgent, getInvokeResult]
+    binding: rest
+    confidence: medium
+    note: document-intelligence-v1 action-item mode.
+  - tool: forcedream_execute_plan
+    category: execution
+    rest: [invokeAgent]
+    binding: rest
+    confidence: low
+    note: >-
+      Capability-routed commissioning; the docs describe POST /v1/procure (anonymous recommendation, confirmed
+      live) followed by the recommended invoke_url, which is invokeAgent. The idempotency_key argument has no
+      counterpart in the 8-op spec; the API host advertises an Idempotency-Key header in CORS allow-headers.
+
+mcp_only:
+  - tool: forcedream_plan_work
+    reason: Backed by POST /v1/procure (live, anonymous, returns recommended_agent + invoke_url) which is documented in the forcedream-docs repo but absent from the published OpenAPI.
+  - tool: forcedream_search_providers
+    reason: Backed by GET /v1/status (live, anonymous, per-provider availability) — not in the published OpenAPI.
+  - tool: forcedream_check_fraud
+    reason: Platform route POST /v1/fraud/check exists in the prose API reference only; the /mcp page marks the tool remote-only.
+  - tool: forcedream_generate_embedding
+    reason: Prose-only platform route; remote-only tool.
+  - tool: forcedream_market_quote
+    reason: Prose-only platform route; remote-only tool.
+  - tool: forcedream_get_earnings
+    reason: Prose-only (GET /v1/account/earn-history, GET /v1/a2a/earnings in the reference); no published contract.
+
+rest_only:
+  - capability: onboarding
+    operations: [signup]
+    note: POST /api/signup — the self-service credential step; the MCP server surfaces it only as the acquisition block inside the -32001 error.
+  - capability: account
+    operations: [getBalance]
+    note: GET /v1/account/balance has no MCP tool (forcedream_get_earnings is the developer-side view, not the buyer balance).
+
+coverage:
+  tools_named: 21
+  tools_bound_to_rest: 15
+  mcp_only: 6
+  rest_operations_total: 8
+  rest_operations_with_a_tool: 6
+  graphql_fields: 0
+  notes:
+    - tools/list was not gated, so every tool's inputSchema is recorded verbatim in mcp/forcedream-ai-mcp-tools-list.json.
+    - The 206-route prose reference is the real breadth of the platform; the crosswalk binds only to the 8 operations a contract exists for.

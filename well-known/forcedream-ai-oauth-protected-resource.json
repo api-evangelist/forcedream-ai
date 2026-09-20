@@ -1,0 +1,1 @@
+{"resource":"https://api.forcedream.ai/v1/mcp","authorization_servers":["https://api.forcedream.ai"],"scopes_supported":["mcp:invoke","mcp:tools"],"bearer_methods_supported":["header"]}

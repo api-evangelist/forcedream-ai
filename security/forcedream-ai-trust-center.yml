@@ -1,0 +1,66 @@
+generated: '2026-09-19'
+method: searched
+probe: true
+source: https://www.forcedream.com/trust
+url: https://www.forcedream.com/trust
+alt_urls:
+  - https://forcedream.ai/trust/
+  - https://www.forcedream.com/trust/compliance
+  - https://www.forcedream.com/trust/controls
+  - https://www.forcedream.com/trust/ledger
+  - https://www.forcedream.com/trust/sla
+  - https://www.forcedream.com/trust/developer
+  - https://www.forcedream.com/trust/enterprise
+  - https://www.forcedream.com/trust/subprocessors
+description: >-
+  A provider-built Trust Centre (not a Vanta/Drata portal) with seven sub-pages. It is unusually candid: the
+  compliance page ticks UK GDPR, Cyber Essentials Plus and FCA Consumer Duty evidence workflows, and marks
+  SOC 2 Type II and ISO/IEC 27001 with a dash and the sentence "ForceDream is not certified" — attributing
+  those to Google Cloud for the London region it runs in. The site footer's "SOC2 in progress" badge and
+  /v1/capabilities ("soc2":"planned","iso_27001":"planned") agree. The initial keyword probe recorded "SOC 2"
+  from the page text; that is corrected here because the page's substance is a denial, not a claim.
+certifications:
+  - name: Cyber Essentials Plus
+    status: claimed
+    evidence: '"Cyber Essentials+ — UK government-backed cyber security certification." (trust/compliance, tick)'
+  - name: UK GDPR
+    status: claimed (compliance statement, not a certification)
+    evidence: '"UK GDPR — Data residency in eu-west-2 London. DPA available on request." (trust/compliance, tick)'
+  - name: FCA Consumer Duty (PS22/9)
+    status: product capability, listed under certifications
+    evidence: '"Evidence gathering and audit workflows for PS22/9." (trust/compliance, tick)'
+explicitly_not_held:
+  - name: SOC 2 Type II
+    evidence: '"ForceDream is not SOC 2 certified. Our hosting provider, Google Cloud, is certified for the data centres we run in."'
+  - name: ISO/IEC 27001
+    evidence: '"ForceDream is not certified. Google Cloud holds ISO/IEC 27001 for the London region we run in. We would rather say this than let a tick imply otherwise."'
+regional_compliance_named: [Nigeria NDPR, Kenya DPA 2019, South Africa POPIA, Singapore PDPA]
+security_controls:
+  encryption: AES-256 at rest; TLS 1.3 in transit; SHA-256 WORM seals
+  access_control: sk_fd_ keys never stored in plaintext, shown once; GitHub/Google OAuth for humans; immediate revocation via POST /v1/account/keys/revoke
+  fraud: 8-signal payout fraud scoring (account age, velocity, IP reputation, amount ratio, device fingerprint, geographic anomaly, hour pattern, recent activity)
+  audit: append-only SHA-256 hash chain, verifiable at GET /v1/ops/worm/verify/:seal; audit export GET /v1/audit/export
+  deployment: '"Every deployment runs all 69 smoke tests before going live; failed tests trigger automatic rollback"'
+data_residency: eu-west-2 London primary; backups eu-west-1; enterprise options London, Dublin, Virginia, Singapore
+dpa: '"DPA — GDPR Article 28. trust@forcedream.ai" (on request; not published)'
+subprocessors: https://www.forcedream.com/trust/subprocessors (dated table, 15 May 2026)
+contacts:
+  trust: trust@forcedream.ai
+  security: security@forcedream.com
+  privacy: privacy@forcedream.com
+  response_commitment: '"Our trust team responds within one business day."'
+evidence:
+  - source: https://www.forcedream.com/trust/compliance
+    http_status: 200
+    fetched: '2026-09-19'
+  - source: https://www.forcedream.com/trust
+    http_status: 200
+    fetched: '2026-09-19'
+  - source: https://api.forcedream.ai/v1/capabilities
+    http_status: 200
+    fetched: '2026-09-19'
+    quote: '"compliance":{"uk_gdpr":"compliant","eu_gdpr":"compliant","soc2":"planned","iso_27001":"planned","note":"Google Cloud and Vercel hold certifications for the underlying infrastructure. ForceDream holds none of its own."}'
+compliance_pointer_basis: >-
+  type: Compliance is emitted on the strength of a published compliance programme (Cyber Essentials Plus
+  claimed, UK GDPR statement, named regional regimes, sub-processor table, security controls page) — not on
+  SOC 2 or ISO 27001, which the provider disclaims.

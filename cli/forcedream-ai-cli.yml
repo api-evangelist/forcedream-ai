@@ -1,0 +1,43 @@
+generated: '2026-09-19'
+method: searched
+source: https://github.com/forcedreamai/forcedream-cli
+sources:
+  - https://github.com/forcedreamai/forcedream-cli (README.md, BillingSafety.md, commands.go)
+  - https://github.com/forcedreamai/homebrew-forcedream (Formula/forcedream.rb)
+  - https://api.github.com/repos/forcedreamai/forcedream-cli/releases
+description: >-
+  `forcedream` is a first-party Go command-line tool that searches for AI agents and MCP servers across the
+  ForceDream marketplace, the official MCP Registry and GitHub (with Smithery and open-web search gated behind a
+  paid billing key), invokes ForceDream agents through the published Go SDK, and verifies Ed25519 proofs
+  entirely client-side. Distributed as source and via a Homebrew tap; the package entry lives in
+  packages/forcedream-ai-packages.yml. A second, narrower CLI — fd-verify — ships inside the npm MCP server
+  package and only verifies proofs.
+repo: https://github.com/forcedreamai/forcedream-cli
+version: v0.3.0
+released: '2026-07-15'
+license: MIT
+install:
+  homebrew: brew install forcedreamai/forcedream/forcedream
+  source: go build -o forcedream .
+  note: The README mentions pre-built binaries in dist/; the GitHub releases (v0.1.0–v0.3.0) carry no assets, so Homebrew builds from the tagged tarball.
+environment:
+  FD_LIVE_KEY: Real fd_live_ billing key; required for `invoke` and for the two paid search sources (Smithery, SerpAPI web search), which also charge the account per successful search.
+  GITHUB_TOKEN: Optional; raises the GitHub search rate limit.
+commands:
+  discovery:
+    - name: search <query>
+      description: Merges, ranks and dedupes results from the ForceDream marketplace (always first), the official MCP Registry and GitHub repository search; Smithery and open-web search are added when FD_LIVE_KEY has balance and a paid-search entitlement, otherwise labelled as requiring sign-in rather than silently omitted. Ranking uses only confirmed signals (GitHub stars, Smithery useCount).
+  execution:
+    - name: invoke <agent_slug> <task>
+      description: Invokes a ForceDream agent through the Go SDK (same polling and decline handling); requires FD_LIVE_KEY.
+  verification:
+    - name: verify <task_id>
+      description: Verifies the Ed25519 proof for a task locally via the Go SDK; ForceDream is never asked whether the proof is valid.
+billing_safety:
+  doc: https://github.com/forcedreamai/forcedream-cli/blob/main/BillingSafety.md
+  note: Paid searches are charged atomically and only after a real result returns; no API key is baked into the binary — the Smithery/SerpAPI keys live on the ForceDream backend.
+companion_cli:
+  name: fd-verify
+  package: "@forcedream/mcp-server"
+  flags: [--json, --quiet]
+  description: Proof verifier wrapping the same verifyProof() function the MCP tool uses; --quiet gives an exit-code-only mode for CI.

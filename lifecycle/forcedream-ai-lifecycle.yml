@@ -1,0 +1,65 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  https://www.forcedream.com/changelog, https://www.forcedream.com/developers/sla, https://www.forcedream.com/trust/sla,
+  https://www.forcedream.com/terms (4.4, 7.1), https://www.forcedream.com/status, https://forcedream.ai/status,
+  https://github.com/forcedreamai/forcedream-mcp/blob/main/CHANGELOG.md, openapi/forcedream-ai-openapi.yml.
+description: >-
+  How ForceDream versions, deprecates and operates its surfaces. The API is unversioned beyond a /v1/ path
+  prefix; change is communicated through a dated platform changelog (v38.70 current) and a semver MCP server
+  (0.12.x). Deprecation is governed by a terms clause, not a published policy page or Sunset headers. The
+  provider publishes an SLA table on its developer docs and simultaneously disclaims any uptime commitment in
+  its terms and on its trust centre; both statements are recorded verbatim.
+versioning:
+  scheme: path prefix + dated platform releases
+  mechanism: /v1/ path prefix on the API; no version header. Platform releases are numbered (v38.70) and dated on the changelog; MCP server and SDKs are semver.
+  current: v1 (API); platform v38.70 (17 August 2026); MCP server 0.12.1 live / 0.12.2 npm; OpenAPI 0.1.0 (2026-07-12 snapshot)
+  docs: https://www.forcedream.com/changelog
+  notes: >-
+    The changelog for v38.70 records "Two legacy execution endpoints retired; public documentation moved to the
+    A2A paths first, so no instruction pointed at a removed route" — retirement happens, and is announced after
+    the docs are moved.
+deprecation:
+  policy_url: https://www.forcedream.com/terms
+  policy_text: '"7.1 ForceDream may add, remove, modify, reprice or deprecate agents, capabilities, routing logic and model providers at any time. Where a change materially affects an agent you rely on, we will use reasonable endeavours to give notice."'
+  changelog: https://www.forcedream.com/changelog
+  sunset_header: false
+  deprecation_header: false
+  notice_period: none stated ("reasonable endeavours")
+  notes: >-
+    The MCP server CHANGELOG records one breaking change (v0.5.1: all tool names prefixed forcedream_) applied
+    to both the local and remote server. No operation in the published OpenAPI is flagged deprecated.
+sla:
+  url: https://www.forcedream.com/developers/sla
+  public_uptime_target:
+    developer_docs: {Free: '99.5%', Starter: '99.5%', Pro: '99.9%', Scale: '99.95%', Enterprise: '99.99%'}
+    trust_centre: {Free: '99.9% target', Pro: '99.95% SLA', Enterprise: 'no uptime commitment'}
+    terms: '"4.4 Service availability. We do not offer an uptime commitment and do not currently publish measured uptime. We aim for reasonable continuity of service."'
+  support_sla: {Free: best effort, Starter: 48 hours, Pro: 24 hours, Scale: 8 hours, Enterprise: 4 hours}
+  credits_on_breach: {Starter: 10% monthly fee, Pro: 25% monthly fee, Scale: 50% monthly fee, Enterprise: 100% monthly fee}
+  downtime_definition: '"the API is returning errors on more than 5% of requests for more than 5 consecutive minutes"'
+  maintenance_window: 'Sundays 02:00–04:00 UTC, announced at least 72 hours ahead via the status page and email; may return 503 during maintenance'
+  notes: >-
+    Three surfaces, three different answers. The status page itself says "Availability not independently
+    measured" and shows "—" for 30-day uptime. Treat the developer-docs table as aspirational and the terms as
+    the binding statement.
+status_page: https://www.forcedream.com/status
+status_page_alt: https://forcedream.ai/status
+status_page_notes: >-
+  Provider-built page (not Statuspage/Instatus); components listed — API (api.forcedream.ai), Frontend
+  (forcedream.com), forcedream.ai, distributed cache (EU), Stripe, Payoneer, PayPawa, GitHub OAuth; "No
+  incidents in the last 90 days"; no RSS/JSON feed found. Live machine health at GET /v1/health (200,
+  {"status":"ok","name":"forcedream","version":"0.12.1"}) and GET /v1/status (per-inference-provider
+  availability), both anonymous.
+rate_limits: https://www.forcedream.com/developers/rate-limits
+changelog: changelog/forcedream-ai-changelog.yml
+retention:
+  proofs_and_tasks: 'free 30-day window; POST /v1/storage/retention/extend to pay for longer (forcedream-docs/billing)'
+  execution_records: deletable on request within 30 days; deletion renders the proof unverifiable and is irreversible (Terms 10.3)
+deprecated_operations: []
+deprecated_products:
+  - name: legacy execution endpoints (unnamed)
+    evidence: 'changelog v38.70 — "Two legacy execution endpoints retired; public documentation moved to the A2A paths first"'
+  - name: unprefixed MCP tool names (search_agents, verify_proof, invoke_agent)
+    superseded_by: forcedream_-prefixed names
+    evidence: MCP CHANGELOG v0.5.1 (BREAKING)

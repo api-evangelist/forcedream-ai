@@ -64,5 +64,25 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-ForceDream is a company surfaced via the API Evangelist harvest backlog (source: a2a-registry) and added to the network as a stub for full-pipeline profiling.
-- https://forcedream.ai/
+ForceDream Ltd (UK Company No. 17057770, London) runs a paid, verifiable AI-agent marketplace — the "ForceDream Intelligence OS" — reachable as a REST API on `api.forcedream.ai`, a remote MCP server at `https://api.forcedream.ai/v1/mcp`, and an A2A 1.0 agent at `https://api.forcedream.ai/v1/a2a/execute`. Every completed execution is Ed25519-signed and verifiable without an account; 78% of the margin on each call goes to the agent's developer.
+
+- Website: https://forcedream.ai/ (technical surface) · https://www.forcedream.com/ (marketing, docs, trust centre)
+- Developer portal: https://www.forcedream.com/developers · API reference: https://www.forcedream.com/developers/api
+- GitHub: https://github.com/forcedreamai
+
+## What this profile holds (enriched 2026-09-19)
+
+| Surface | Artifact | How it was obtained |
+|---|---|---|
+| OpenAPI 3.1 (8 operations, SDK-verified) | `openapi/forcedream-ai-openapi.yml` | fetched verbatim from github.com/forcedreamai/forcedream-openapi; every route confirmed live |
+| A2A agent card (protocolVersion 1.0, 18 skills, ES256-signed) | `a2a/forcedream-ai-agent-card.json` + `a2a/forcedream-ai-a2a.yml` | probed at `/.well-known/agent-card.json` on api.forcedream.ai and forcedream.ai; graded **conformant** |
+| MCP server (21 tools, 5 prompts, 2 resources) | `mcp/forcedream-ai-mcp.yml`, `mcp/forcedream-ai-mcp-tools-list.json`, `mcp/forcedream-ai-tool-crosswalk.yml` | anonymous `initialize` / `tools/list` on the live endpoint; deployment `both` (remote + `npx -y @forcedream/mcp-server`) |
+| OAuth discovery (RFC 8414, RFC 9728, RFC 7591), JWKS, security.txt | `well-known/` | probed on every host; index in `well-known/forcedream-ai-well-known.yml` |
+| llms.txt (two variants) | `llms/` | fetched from forcedream.ai and www.forcedream.com |
+| 12 SDKs, MCP package, CLI + Homebrew tap | `packages/`, `cli/` | registries queried unauthenticated; 7 SDKs on registries at 0.3.0, 5 source-only |
+| Conventions, idempotency, reversibility, errors, rate limits, lifecycle, changelog, plans, sandbox | `conventions/`, `errors/`, `rate-limits/`, `lifecycle/`, `changelog/`, `plans/`, `sandbox/` | searched on the developer docs, terms and trust centre |
+| Webhooks (7 events) | `asyncapi/forcedream-ai-webhooks-asyncapi.yml` | generated faithfully from the provider's webhooks page — ForceDream publishes no AsyncAPI |
+| Conformance, regulatory posture, authentication, scopes, security | `conformance/`, `regulatory/`, `authentication/`, `scopes/`, `security/` | searched + probed |
+| Agent skills (3) | `skills/` | generated, grounded in verified operationIds |
+
+**Contract discovery note.** `https://forcedream.ai/openapi.json` (also served on api.forcedream.ai and forcedream.com) parses as OpenAPI 3.0.0 but is a different document — "ForceDream Data Oracle", 15 `/v1/oracle/*` routes, `servers[]` set to an ngrok placeholder — and those routes return 404 on the live API host. It is recorded in `well-known/forcedream-ai-well-known.yml` and deliberately not wired as a contract.

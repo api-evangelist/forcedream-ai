@@ -1,0 +1,171 @@
+generated: '2026-09-19'
+method: probed
+source: https://api.forcedream.ai/.well-known/agent-card.json
+card:
+  file: a2a/forcedream-ai-agent-card.json
+discovery:
+  path: /.well-known/agent-card.json
+  canonical: true
+  host: api.forcedream.ai
+  note: >-
+    The identical 10,044-byte card is served from both technical hosts, forcedream.ai and api.forcedream.ai
+    (the two hosts answer every probed path identically and appear to be one origin behind Google Frontend),
+    at both the canonical /.well-known/agent-card.json and the legacy /.well-known/agent.json. The marketing
+    domain (www.forcedream.com and the apex) returns an XML 404 for every /.well-known/* path except
+    security.txt. A negative-control path (/.well-known/apievangelist-negative-control-3f9a1c.json) returns
+    the host's generic JSON 404 ({"error":"Route not found"}, 27 bytes), so the 200s are served documents,
+    not a catch-all. api.forcedream.ai is recorded as the discovery host because it is the host the card's own
+    url, the OAuth issuer, the protected-resource metadata and the A2A runtime README all name. A second file,
+    /.well-known/agent-card-v1.json (8,038 bytes, saved verbatim as a2a/forcedream-ai-agent-card-v1.json), is
+    the OLDER pre-1.0 shape despite its name: no protocolVersion, a supportedInterfaces[] block, the same 18
+    skills; the canonical path carries the 1.0-shaped card and is the one graded here.
+  ownership: >-
+    provider.organization is "ForceDream" with provider.url https://forcedream.ai; the card's url, OAuth
+    endpoints and extension endpoints all sit on api.forcedream.ai; documentationUrl and iconUrl are on
+    www.forcedream.com; security.txt on all hosts names ForceDream Ltd (Company No. 17057770) and
+    security@forcedream.com; the GitHub account forcedreamai (blog: https://forcedream.ai) publishes the A2A
+    runtime README that names this exact card URL. One company, two domains (a marketing .com and a technical
+    .ai), stated in the provider's own robots.txt "Domain separation" comment.
+conformance:
+  spec: A2A 1.0.0
+  grade: conformant
+  protocol_version: '1.0'
+  preferred_transport: JSONRPC
+  deviations: []
+  checks:
+    capabilities_is_object: true
+    protocolVersion_present: true
+    skills_is_array: true
+    preferredTransport_present: true
+    defaultInputModes_present: true
+    defaultOutputModes_present: true
+    securitySchemes_present: true
+    provider_present: true
+    documentationUrl_present: true
+    signatures_present: true
+  notes:
+  - >-
+    Three of the 18 skills (document:grounding, document:intelligence, evaluation:video) carry the
+    placeholder description "This capability is available. It has not yet received a written description."
+    — real, registered capabilities with no prose yet; recorded as published, not as a deviation.
+  - >-
+    The card is signed: signatures[0].protected decodes to {"alg":"ES256","kid":"b9ce5d84d3ca"} and that kid
+    is the P-256 key in https://api.forcedream.ai/.well-known/jwks.json (saved as
+    well-known/forcedream-ai-jwks.json), alongside the Ed25519 key (kid bc21b1928474) that signs execution
+    proofs. Signature verification was not performed by this pass; the material to do so is recorded.
+  - >-
+    capabilities.extensions[] declares five extensions: A2UI v0.9 (surface/action endpoints), a Gemini
+    Enterprise dynamic-client-registration target, the anonymous /v1/factory/dashboard measured-state feed,
+    RFC 8414 authorization-server metadata with RFC 7591 registration, and a provider-authored
+    self-service-credentials/v1 extension stating the signup endpoint, the credential field (live_key, prefix
+    fd_live_), a 1,000-pence GBP credit grant and a per-IP signup rate limit of 5 per 3,600 seconds.
+x-evidence:
+  fetched: '2026-09-19'
+  url: https://api.forcedream.ai/.well-known/agent-card.json
+  http_status: 200
+  content_type: application/json; charset=utf-8
+  body_bytes: 10044
+  body_parses_as: >-
+    JSON object with AgentCard shape (protocolVersion, name, description, url, version, documentationUrl,
+    provider, capabilities{streaming,pushNotifications,extensions[]}, defaultInputModes, defaultOutputModes,
+    security, securitySchemes, iconUrl, skills[18], preferredTransport, signatures)
+  corroborating_probes:
+  - url: https://forcedream.ai/.well-known/agent-card.json
+    http_status: 200
+    note: Byte-identical body (10,044 bytes).
+  - url: https://forcedream.ai/.well-known/agent.json
+    http_status: 200
+    note: Legacy path, byte-identical body.
+  - url: https://api.forcedream.ai/.well-known/agent.json
+    http_status: 200
+  - url: https://api.forcedream.ai/.well-known/agent-card-v1.json
+    http_status: 200
+    note: Older-shaped card (no protocolVersion, supportedInterfaces) — saved verbatim, not graded.
+  - url: https://www.forcedream.com/.well-known/agent-card.json
+    http_status: 404
+    note: Marketing host; XML 404 body.
+  - url: https://api.forcedream.ai/.well-known/apievangelist-negative-control-3f9a1c.json
+    http_status: 404
+    note: Negative control — generic JSON 404, proving the card 200s are not a catch-all.
+  - url: https://api.forcedream.ai/v1/.well-known/agents/lead-score-v1/agent-card.json
+    http_status: 200
+    note: Per-agent card (protocolVersion 1.0, url https://api.forcedream.ai/v1/a2a/execute/lead-score-v1).
+  - url: https://api.forcedream.ai/v1/a2a/execute
+    method: POST
+    body: '{"jsonrpc":"2.0","id":1,"method":"message/send","params":{}}'
+    http_status: 200
+    response: '{"jsonrpc":"2.0","id":1,"result":{"kind":"message","role":"agent","parts":[{"kind":"text","text":"Hello! I can help you get work done by AI agents. What kind of task are you looking to accomplish?"}],"messageId":"msg_...","contextId":"ctx_..."}}'
+    note: >-
+      A live A2A JSON-RPC responder answering an empty anonymous message/send with an agent Message (no task
+      was created, nothing was purchased). Authenticated invocation was not attempted.
+  - url: https://api.forcedream.ai/.well-known/jwks.json
+    http_status: 200
+    note: Two keys — ES256 kid b9ce5d84d3ca (card signature) and EdDSA/Ed25519 kid bc21b1928474 (proofs).
+  - url: https://a2aregistry.org
+    note: >-
+      The card was first seen as one of 415 agents listed on a2aregistry.org (fetched 2026-09-19, author
+      "ForceDream"), which is how this provider entered the harvest backlog. The registry was the lead; the card
+      above was fetched from the provider's own host. The A2A runtime README also states the card is registered
+      in Google's Agent Registry (europe-west2); that listing was not independently fetched.
+agent_card:
+  name: ForceDream
+  description: >-
+    ForceDream routes work to specialist agents and returns a verifiable record of what happened. Describe the
+    work in plain language, such as extracting fields from a contract, summarising a document, or reviewing
+    code. ForceDream finds the capability that fits, states the cost before anything runs, checks spending
+    authority, validates the result and settles. Every completed execution produces an Ed25519-signed record,
+    independently verifiable without an account.
+  url: https://api.forcedream.ai/v1/a2a/execute
+  version: 1.0.0
+  protocol_version: '1.0'
+  preferred_transport: JSONRPC
+  documentation_url: https://www.forcedream.com/developers/quickstart
+  icon_url: https://www.forcedream.com/icon-512.png
+  provider:
+    organization: ForceDream
+    url: https://forcedream.ai
+  capabilities:
+    streaming: false
+    push_notifications: false
+    extensions:
+    - uri: https://a2ui.org/a2a-extension/a2ui/v0.9
+      required: false
+    - uri: https://cloud.google.com/marketplace/docs/partners/ai-agents/setup-dcr
+      required: false
+    - uri: https://api.forcedream.ai/v1/factory/dashboard
+      required: false
+    - uri: https://api.forcedream.ai/.well-known/oauth-authorization-server
+      required: false
+    - uri: https://www.forcedream.com/a2a/extensions/self-service-credentials/v1
+      required: false
+  default_input_modes: [application/json]
+  default_output_modes: [application/json]
+  security:
+  - oauth2: [agent.execute]
+  security_schemes:
+    bearerAuth: {type: http, scheme: bearer}
+    oauth2:
+      type: oauth2
+      authorization_url: https://api.forcedream.ai/v1/oauth/authorize
+      token_url: https://api.forcedream.ai/v1/oauth/token
+      scopes: {agent.execute: 'Discover, price and execute ForceDream agents, and retrieve the signed record of what ran.'}
+  skill_count: 18
+  skills:
+  - {id: 'research:citation', name: 'research:citation'}
+  - {id: 'analytics:anomaly-detection', name: 'analytics:anomaly-detection'}
+  - {id: coding, name: coding}
+  - {id: 'compliance:audit', name: 'compliance:audit'}
+  - {id: 'code:review', name: 'code:review'}
+  - {id: summarization, name: summarization}
+  - {id: classification, name: classification}
+  - {id: 'document:grounding', name: 'document:grounding', note: placeholder description}
+  - {id: 'sales:lead-scoring', name: 'sales:lead-scoring'}
+  - {id: 'data:extraction', name: 'data:extraction'}
+  - {id: 'analytics:forecast', name: 'analytics:forecast'}
+  - {id: 'document:intelligence', name: 'document:intelligence', note: placeholder description}
+  - {id: 'data:aggregation', name: 'data:aggregation'}
+  - {id: 'pricing:optimization', name: 'pricing:optimization'}
+  - {id: translation, name: translation}
+  - {id: 'data:validation', name: 'data:validation'}
+  - {id: sentiment, name: sentiment}
+  - {id: 'evaluation:video', name: 'evaluation:video', note: placeholder description}

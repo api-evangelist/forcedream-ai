@@ -1,0 +1,245 @@
+generated: '2026-09-19'
+method: searched
+description: >-
+  Results of probing the /.well-known/ discovery surface, by name, on every host the record knows: the
+  registrable technical domain forcedream.ai and its www, the API/MCP/A2A host api.forcedream.ai (also the
+  OAuth issuer and the authorization_servers[0] named by the protected-resource document), and the marketing
+  domain www.forcedream.com plus its apex. forcedream.ai and api.forcedream.ai answer every path identically
+  and appear to be one origin (Express behind Google Frontend); www.forcedream.ai does not resolve.
+  www.forcedream.com and forcedream.com are a static Vercel site that returns an XML 404 for everything under
+  /.well-known/ except security.txt. Only documents that returned a 200 with a real, correctly-typed body were
+  saved verbatim. A generic JSON 404 ({"error":"Route not found"}, 27 bytes) is the miss shape on the
+  technical hosts, and a negative-control path returned it too, so no 200 here is a catch-all.
+hosts:
+- host: https://api.forcedream.ai
+  role: API host, MCP resource server, OAuth issuer, A2A host
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    type: text/plain
+    file: forcedream-ai-security.txt
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    type: application/json
+    file: forcedream-ai-oauth-authorization-server.json
+    note: >-
+      RFC 8414 metadata — issuer https://api.forcedream.ai, authorization/token/registration endpoints under
+      /v1/oauth/, response_types [code], grant_types [authorization_code, refresh_token], PKCE S256,
+      token_endpoint_auth_methods [none, client_secret_post], scopes_supported [mcp:invoke, mcp:tools].
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    type: application/json
+    file: forcedream-ai-oauth-protected-resource.json
+    note: >-
+      RFC 9728 metadata — resource https://api.forcedream.ai/v1/mcp, authorization_servers
+      [https://api.forcedream.ai], scopes_supported [mcp:invoke, mcp:tools], bearer_methods_supported [header].
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/api-catalog.json
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 200
+    type: application/json
+    file: ../a2a/forcedream-ai-agent-card.json
+    note: A2A agent card, protocolVersion 1.0 — graded in a2a/forcedream-ai-a2a.yml.
+  - path: /.well-known/agent.json
+    status: 200
+    type: application/json
+    note: Legacy A2A path; byte-identical to agent-card.json, not saved twice.
+  - path: /.well-known/agent-card-v1.json
+    status: 200
+    type: application/json
+    file: ../a2a/forcedream-ai-agent-card-v1.json
+    note: Older-shaped card (no protocolVersion) despite the name.
+  - path: /.well-known/jwks.json
+    status: 200
+    type: application/json
+    file: forcedream-ai-jwks.json
+    note: Not on the closed probe list; recorded because the agent card's JWS signature and the Ed25519 proof key both resolve here (kids b9ce5d84d3ca ES256, bc21b1928474 EdDSA).
+  - path: /.well-known/apievangelist-negative-control-3f9a1c.json
+    status: 404
+    note: Negative control.
+- host: https://forcedream.ai
+  role: registrable technical domain; Website pointer
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    type: text/plain
+    file: forcedream-ai-security.txt
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    type: application/json
+    file: forcedream-ai-oauth-authorization-server.json
+    note: Byte-identical to the api host copy.
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    type: application/json
+    file: forcedream-ai-oauth-protected-resource.json
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/api-catalog.json
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 200
+    type: application/json
+    file: ../a2a/forcedream-ai-agent-card.json
+  - path: /.well-known/agent.json
+    status: 200
+    type: application/json
+  - path: /.well-known/jwks.json
+    status: 200
+    type: application/json
+    file: forcedream-ai-jwks.json
+  - path: /.well-known/apievangelist-negative-control-3f9a1c.json
+    status: 404
+- host: https://www.forcedream.ai
+  role: www of the technical domain
+  status: unreachable
+  note: DNS does not resolve (curl exit 6, HTTP 000) for every path; the provider's robots.txt names forcedream.ai without www.
+  documents:
+  - path: /.well-known/security.txt
+    status: 0
+  - path: /.well-known/openid-configuration
+    status: 0
+  - path: /.well-known/oauth-authorization-server
+    status: 0
+  - path: /.well-known/oauth-protected-resource
+    status: 0
+  - path: /.well-known/api-catalog
+    status: 0
+  - path: /.well-known/ai-plugin.json
+    status: 0
+  - path: /.well-known/agent-card.json
+    status: 0
+- host: https://www.forcedream.com
+  role: marketing site, developer docs, trust centre (Vercel static)
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    type: text/plain
+    file: forcedream-ai-security.txt
+    note: Byte-identical to the technical hosts; its Canonical line names https://forcedream.com/.well-known/security.txt.
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/api-catalog.json
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/jwks.json
+    status: 404
+- host: https://forcedream.com
+  role: apex of the marketing domain (serves the same site as www)
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    type: text/plain
+    file: forcedream-ai-security.txt
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/ucp.json
+    status: 404
+  - path: /.well-known/acp.json
+    status: 404
+  - path: /.well-known/aauth-resource.json
+    status: 404
+  - path: /.well-known/apis.json
+    status: 404
+  - path: /apis.json
+    status: 404
+  - path: /apis.yml
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+security_txt:
+  file: forcedream-ai-security.txt
+  contact: mailto:security@forcedream.com
+  policy: https://forcedream.com/trust
+  canonical: https://forcedream.com/.well-known/security.txt
+  preferred_languages: en
+  expires: null
+  note: >-
+    RFC 9116 requires an Expires field; this file has none (a conformance gap, recorded in
+    conformance/forcedream-ai-conformance.yml). It also carries a comment identifying ForceDream Ltd (Company No.
+    17057770) and inviting categorisation/allowlist requests.
+also_served:
+  - path: /llms.txt
+    hosts: [forcedream.ai, api.forcedream.ai]
+    status: 200
+    file: ../llms/forcedream-ai-llms.txt
+  - path: /llms.txt
+    hosts: [www.forcedream.com, forcedream.com]
+    status: 200
+    file: ../llms/forcedream-ai-forcedream-com-llms.txt
+    note: A different, longer llms.txt than the technical hosts serve.
+  - path: /openapi.json
+    hosts: [forcedream.ai, api.forcedream.ai, www.forcedream.com, forcedream.com]
+    status: 200
+    note: >-
+      Parses as OpenAPI 3.0.0 titled "ForceDream Data Oracle" (15 POST /v1/oracle/* routes, "HTTP 402 + Stripe
+      payment") but its servers[] is https://YOUR-NGROK-URL.ngrok-free.app and POST /v1/oracle/lead_score on
+      api.forcedream.ai returns 404 Route not found — a development artifact describing a surface that is not
+      live. Not saved to openapi/ and not wired; the wired contract is the GitHub-published SDK-verified spec.

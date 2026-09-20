@@ -1,0 +1,31 @@
+generated: '2026-09-19'
+method: probed
+source: live DNS/TLS/HTTP probes of apis.yml + OpenAPI hosts
+hosts:
+- host: forcedream.ai
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Dec 10 15:18:48 2026 GMT
+  hsts: false
+- host: www.forcedream.com
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Dec  9 22:52:11 2026 GMT
+  hsts: false
+- host: api.forcedream.ai
+  https: true
+  tls_version: TLSv1.3
+  cert_expires: Dec  8 21:44:20 2026 GMT
+  hsts: false
+domains:
+- domain: forcedream.ai
+  dnssec: false
+  caa: []
+  spf: true
+  dmarc: false
+- domain: forcedream.com
+  dnssec: false
+  caa: []
+  spf: true
+  dmarc: true
+  dmarc_policy: none

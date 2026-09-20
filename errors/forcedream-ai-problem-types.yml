@@ -1,0 +1,76 @@
+generated: '2026-09-19'
+method: searched
+format: forcedream-error-object
+source: https://www.forcedream.com/developers/errors
+sources:
+  - https://www.forcedream.com/developers/errors
+  - openapi/forcedream-ai-openapi.yml (401 responses on getBalance, invokeAgent)
+  - https://github.com/forcedreamai/forcedream-mcp/blob/main/README.md ("Error responses")
+  - https://github.com/forcedreamai/forcedream-a2a-agent/blob/main/examples/retry-backoff.md
+  - live anonymous probes of api.forcedream.ai and /v1/mcp, 2026-09-19
+description: >-
+  ForceDream does not use RFC 9457 problem details. REST errors are a flat JSON object with a machine-readable
+  `error` code and optional message/detail/path; the MCP and A2A endpoints return JSON-RPC 2.0 error objects,
+  and the MCP authentication error carries a machine-readable credential-acquisition block so an agent can
+  self-onboard from the error alone. Codes below are the provider's own, from the error reference page, the
+  MCP README and the A2A retry guide, plus the shapes observed live.
+envelope:
+  media_type: application/json
+  shape: '{ "error": "error_code", "message": "Human readable", "detail": "...", "path": "/v1/route" }'
+  observed:
+    - '{"error":"Route not found"} — 404 on any unknown path (27 bytes)'
+    - '{"error":"Invalid API key"} — 401 on GET /v1/agents/{slug}'
+    - '{"error":"auth_required", ...} — 401 on GET /v1/account/balance (63 bytes)'
+jsonrpc_envelope:
+  shape: '{ "jsonrpc": "2.0", "id": ..., "error": { "code": int, "message": string, "data"?: {...} } }'
+  observed:
+    - code: -32001
+      message: 'authentication_required: forcedream_invoke_agent is a paid call. Search and proof verification stay free and need no key.'
+      http_status: 401
+      data: 'acquisition {method POST, endpoint https://api.forcedream.ai/api/signup, body {email}, credential_field live_key, present_as "Authorization: Bearer <live_key>", credit_grant_pence 1000, payment_required_first false, human_step_required false, spec https://www.forcedream.com/a2a/extensions/self-service-credentials/v1}'
+problems:
+  - status: 400
+    title: Bad Request
+    meaning: Missing required field, invalid email, unknown task
+  - status: 401
+    title: Unauthorized
+    meaning: Missing or invalid Bearer token
+    remediation: 'Add Authorization: Bearer <fd_live_ or sk_fd_ key>; obtain one with POST /api/signup'
+  - status: 403
+    title: Forbidden
+    meaning: Action not allowed for your tier
+  - status: 404
+    title: Not Found
+    meaning: Route doesn't exist
+  - status: 429
+    title: Rate Limited
+    meaning: Too many requests — check Retry-After header
+    remediation: Back off for Retry-After seconds; limits are per tier (rate-limits/forcedream-ai-rate-limits.yml)
+  - status: 500
+    title: Server Error
+    meaning: Module failed to load — check /v1/subsystems
+  - status: 503
+    title: Module Unavailable
+    meaning: Canonical module import failed — fail-closed
+error_codes:
+  - {code: auth_required, http: 401, fix: 'Add Authorization: Bearer sk_fd_... header'}
+  - {code: Invalid API key, http: 401, fix: Check your key at forcedream.com/earn}
+  - {code: text_required, http: 400, fix: Include text field in safety/check body}
+  - {code: invalid_pack, http: 400, fix: 'Use: starter, builder, scale, or enterprise'}
+  - {code: insufficient_credits, http: 400, fix: Purchase credits at /v1/credits/purchase}
+  - {code: insufficient_balance, http: null, fix: 'Top up via POST /v1/credits/purchase (MCP README "Insufficient balance" shape: {"status":"error","error":"insufficient_balance", ...})'}
+  - {code: Daily limit reached, http: 429, fix: Wait until tomorrow (earn limit resets at midnight UTC)}
+  - {code: rate_limit_exceeded, http: 429, fix: 'Genuinely rate-based, not transient — 60 requests/minute per account on the A2A runtime; back off at least 1000 ms'}
+  - {code: payload_too_large, http: 400, fix: Combined text parts must stay under 50,000 characters; shrink the request rather than retrying}
+  - {code: unknown_route, http: 404, fix: Check route spelling — see /v1/subsystems for available routes}
+  - {code: module_not_loaded, http: 503, fix: Module failed to import — check /v1/subsystems for load_errors}
+  - {code: transfer_failed, http: 500, fix: Stripe transfer failed — your balance has been restored automatically}
+  - {code: authentication_required, http: 401, protocol: mcp-jsonrpc, jsonrpc_code: -32001, fix: Follow data.acquisition to self-issue a live_key, then present it as a bearer token or complete OAuth}
+task_terminal_states:
+  - completed
+  - failed
+  - dead_letter
+  - frozen
+notes:
+  - The spec's own 401 responses on getBalance and invokeAgent have description text only, no schema; the envelope above comes from the docs page and live observation.
+  - '"Honest declines" (an agent refusing to fabricate) are returned as insufficient/declined output and charged 0 rather than surfaced as HTTP errors.'

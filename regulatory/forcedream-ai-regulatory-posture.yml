@@ -1,0 +1,120 @@
+generated: '2026-09-19'
+method: searched
+probe: true
+source: https://www.forcedream.com/trust
+sources_checked:
+  - https://www.forcedream.com/trust (200)
+  - https://www.forcedream.com/trust/compliance (200)
+  - https://www.forcedream.com/trust/subprocessors (200)
+  - https://www.forcedream.com/trust/developer (200)
+  - https://www.forcedream.com/trust/enterprise (200)
+  - https://www.forcedream.com/privacy (200)
+  - https://www.forcedream.com/terms (200)
+  - https://www.forcedream.com/accessibility (404)
+  - https://www.forcedream.com/legal/subprocessors (404)
+  - https://www.forcedream.com/legal/dpa (404)
+  - https://www.forcedream.com/gdpr (404)
+  - https://www.forcedream.com/request-dpa (404)
+  - https://www.forcedream.com/roadmap (404)
+  - https://www.forcedream.com/security (404)
+  - https://forcedream.ai/security (404)
+  - well-known/forcedream-ai-security.txt (Policy https://forcedream.com/trust)
+description: >-
+  Horizontal regulatory signals ForceDream actually publishes. Harvest only — whether a regime applies is
+  decided by the Kin Score regime map, not here. Four signals carry substance: a dated sub-processor table
+  with a change-notice period, a documented data-subject request path with a real API endpoint, stated data
+  residency with named regions, and a documented portability/export endpoint. Nothing was found for SBOM,
+  support lifetime, accessibility conformance, training-data summary, a standalone AI-transparency statement,
+  Global Privacy Control, incident-notification SLA, age assurance, notice-and-action or a transparency report.
+signals:
+  subprocessors:
+    url: https://www.forcedream.com/trust/subprocessors
+    dated: '2026-05-15'
+    change_notice: '"We will notify customers of material sub-processor changes with at least 10 days notice."'
+    entries:
+      - {vendor: Vercel Inc., purpose: API hosting, serverless functions, frontend CDN, location: USA / London (lhr1)}
+      - {vendor: GitHub Inc., purpose: Source code repository, CI/CD, OAuth login, location: USA}
+      - {vendor: Upstash Inc., purpose: Redis — session data, WORM ledger, earn events, location: EU (Frankfurt) / USA}
+      - {vendor: Stripe Inc., purpose: Payment processing, Connect payouts, subscription billing, location: USA / EU}
+      - {vendor: Payoneer Pty Ltd, purpose: Multi-currency accounts, FX, international transfers, location: Hong Kong / UK / EU}
+      - {vendor: Anthropic PBC, purpose: Claude models — routing engine, earn tasks, agent runtime, location: USA}
+      - {vendor: Vercel Analytics, purpose: Web analytics, location: USA}
+      - {vendor: Google LLC (GA4), purpose: Conversion funnel analytics — with consent only, location: USA / EU}
+      - {vendor: Safaricom PLC (M-Pesa), purpose: Kenya mobile money, location: Kenya}
+      - {vendor: MTN Group, purpose: Ghana/Uganda mobile money, location: South Africa / Ghana / Uganda}
+      - {vendor: Orange S.A., purpose: Senegal, Côte d'Ivoire mobile money, location: France / West Africa}
+      - {vendor: Paystack (Stripe), purpose: Nigeria card and bank payments, location: USA / Nigeria}
+      - {vendor: Airtel Africa PLC, purpose: Kenya Airtel Money, location: UK / Kenya}
+    evidence:
+      - source: https://www.forcedream.com/trust/subprocessors
+        http_status: 200
+        fetched: '2026-09-19'
+        quote: '"Last updated: 15 May 2026 · Company No. 17057770" — a four-column table (Sub-processor, Purpose, Location, Data transferred) in five groups.'
+    note: >-
+      The privacy policy's own §4 names a partly different list (adds Resend, OpenAI, Groq; the table adds
+      Payoneer and the African payment rails) — the dated table is the substantive artifact and is what is
+      recorded.
+  data_subject_request:
+    url: https://www.forcedream.com/privacy
+    section: 6 (rights) and trust/developer "Data rights"
+    channel: trust@forcedream.ai / privacy@forcedream.com / legal@forcedream.com
+    api: DELETE /api/user/data
+    rights_named: [access, rectification, erasure, portability, objection]
+    stated_sla: '"We will action requests within 30 days." (Terms 10.3, execution-record deletion)'
+    evidence:
+      - source: https://www.forcedream.com/privacy
+        http_status: 200
+        fetched: '2026-09-19'
+        quote: '"Under UK GDPR you have rights of access, rectification, erasure, portability, and objection. Contact: trust@forcedream.ai. To delete your account: DELETE /api/user/data via the API."'
+      - source: https://www.forcedream.com/trust/developer
+        http_status: 200
+        fetched: '2026-09-19'
+        quote: '"Erasure: DELETE /api/user/data — immediate anonymisation · Portability: GET /v1/audit/export — full JSON export"'
+    note: A documented request path with a real self-service endpoint, not just a mailbox. The endpoint was not exercised.
+  data_residency:
+    url: https://www.forcedream.com/trust/enterprise
+    regions: [uk-london (eu-west-2, primary), eu-dublin (eu-west-1, backups), us-virginia, sg-singapore]
+    evidence:
+      - source: https://www.forcedream.com/privacy
+        http_status: 200
+        fetched: '2026-09-19'
+        quote: '"Primary data stored in eu-west-2 (London). AES-256 at rest. TLS 1.3 in transit. Backups in eu-west-1 (Ireland). No transfers outside EU adequacy scope."'
+      - source: https://www.forcedream.com/trust/enterprise
+        http_status: 200
+        fetched: '2026-09-19'
+        quote: '"Data residency — London, Dublin, Virginia, Singapore. Configurable."'
+      - source: https://api.forcedream.ai/v1/capabilities
+        http_status: 200
+        fetched: '2026-09-19'
+        quote: '"data_residency":"eu-west-2 London"'
+    note: >-
+      The sub-processor table shows Upstash in Frankfurt/USA and Vercel in USA/London, and the privacy policy
+      says no transfers outside EU adequacy scope; the enterprise "Virginia" option and the US-located
+      sub-processors are the provider's statements, recorded as-is.
+  exit_assistance:
+    url: https://www.forcedream.com/trust/developer
+    mechanism: GET /v1/audit/export — full cryptographically sealed JSON export; balance withdrawable at any time (£5 minimum)
+    evidence:
+      - source: https://www.forcedream.com/trust/developer
+        http_status: 200
+        fetched: '2026-09-19'
+        quote: '"Portability: GET /v1/audit/export — full JSON export · Balance withdrawable at any time — no lock-up"'
+      - source: https://www.forcedream.com/trust/enterprise
+        http_status: 200
+        fetched: '2026-09-19'
+        quote: '"Audit log export — cryptographically sealed JSON export. GET /v1/audit/export"'
+    note: A documented export endpoint for the customer's records; no switching-assistance commitment beyond that.
+not_found:
+  sbom: searched trust centre, security pages, GitHub org — none published
+  support_lifetime: no stated support period on versioning/changelog/terms (Terms 7.1 allows change "at any time")
+  accessibility_conformance: /accessibility 404; no VPAT or WCAG statement found
+  training_data_summary: none
+  ai_transparency: >-
+    no standalone statement; the closest substance is that every signed proof records "which model actually
+    served the request" and /v1/factory/dashboard exposes the default provider/model — recorded here as a note,
+    not asserted as a signal
+  global_privacy_control: no published statement (not probed by header, per the rule)
+  incident_notification: DPA "available on request" (GDPR Art. 28); no published breach-notification SLA
+  age_assurance: none
+  notice_and_action: none
+  transparency_report: none

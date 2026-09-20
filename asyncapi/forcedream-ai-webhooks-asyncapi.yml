@@ -1,0 +1,200 @@
+x-provenance:
+  generated: '2026-09-19'
+  method: generated
+  source: https://www.forcedream.com/developers/webhooks
+  note: >-
+    ForceDream publishes no AsyncAPI document. This one is generated faithfully from the provider's own
+    webhooks page: the seven-row "Available webhook events" table (event, trigger, payload includes), the
+    documented payload structure and example, the registration call (POST /v1/webhooks with url, events[],
+    secret) and the X-ForceDream-Signature HMAC-SHA256 verification rule. Every event name, trigger and field
+    below is the provider's text; the example payload is the provider's own. No event, field or schema has
+    been invented. Retry schedule and delivery guarantees are not documented and are therefore not stated.
+asyncapi: 3.0.0
+info:
+  title: ForceDream Webhooks
+  version: 1.0.0
+  description: >-
+    "Real-time events for everything." ForceDream POSTs a JSON body to endpoints you register through POST
+    /v1/webhooks when users earn, withdraw, agents complete or fail, users sign up, or the fraud layer blocks a
+    payout. Every payload includes a WORM seal for verification, and every delivery carries an
+    X-ForceDream-Signature header (HMAC-SHA256 of the body with your webhook secret).
+  contact:
+    name: ForceDream
+    url: https://www.forcedream.com/contact
+    email: support@forcedream.com
+  externalDocs:
+    description: ForceDream webhook documentation
+    url: https://www.forcedream.com/developers/webhooks
+defaultContentType: application/json
+servers:
+  subscriber:
+    host: your-app.example.com
+    protocol: https
+    description: Your own HTTPS endpoint, registered with POST https://api.forcedream.ai/v1/webhooks. ForceDream is the publisher; your endpoint receives.
+channels:
+  webhookEndpoint:
+    address: /webhooks/forcedream
+    description: The URL you registered. All events are delivered as HTTP POST with a JSON body.
+    messages:
+      earnCompleted: {$ref: '#/components/messages/earnCompleted'}
+      withdrawalInitiated: {$ref: '#/components/messages/withdrawalInitiated'}
+      withdrawalFailed: {$ref: '#/components/messages/withdrawalFailed'}
+      agentCompleted: {$ref: '#/components/messages/agentCompleted'}
+      agentFailed: {$ref: '#/components/messages/agentFailed'}
+      signupCreated: {$ref: '#/components/messages/signupCreated'}
+      fraudBlocked: {$ref: '#/components/messages/fraudBlocked'}
+operations:
+  receiveForceDreamEvent:
+    action: receive
+    channel: {$ref: '#/channels/webhookEndpoint'}
+    summary: Receive a ForceDream webhook event
+    description: Verify X-ForceDream-Signature against HMAC-SHA256(body, secret) before trusting the payload.
+    bindings:
+      http:
+        method: POST
+        headers:
+          type: object
+          properties:
+            X-ForceDream-Signature:
+              type: string
+              description: HMAC-SHA256 of the payload body using your webhook secret.
+    messages:
+      - {$ref: '#/channels/webhookEndpoint/messages/earnCompleted'}
+      - {$ref: '#/channels/webhookEndpoint/messages/withdrawalInitiated'}
+      - {$ref: '#/channels/webhookEndpoint/messages/withdrawalFailed'}
+      - {$ref: '#/channels/webhookEndpoint/messages/agentCompleted'}
+      - {$ref: '#/channels/webhookEndpoint/messages/agentFailed'}
+      - {$ref: '#/channels/webhookEndpoint/messages/signupCreated'}
+      - {$ref: '#/channels/webhookEndpoint/messages/fraudBlocked'}
+components:
+  schemas:
+    Envelope:
+      type: object
+      required: [event, ts, data]
+      properties:
+        event: {type: string, description: Event name, e.g. earn.completed}
+        ts: {type: integer, description: Unix time in milliseconds}
+        data: {type: object}
+  messages:
+    earnCompleted:
+      name: earn.completed
+      title: earn.completed
+      summary: User earns from /v1/earn/1 or /v1/route
+      payload:
+        allOf:
+          - {$ref: '#/components/schemas/Envelope'}
+          - type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  user_id: {type: string}
+                  earned_pence: {type: integer}
+                  worm_seal: {type: string}
+      examples:
+        - name: docs-example
+          payload:
+            event: earn.completed
+            ts: 1747043200000
+            data:
+              user_id: usr_1e09b31d...
+              task: summarise_sentence
+              earned_pence: 78
+              earned_gbp: £0.78
+              balance_pence: 156
+              worm_seal: c2e91c81...
+              record_id: earn1-986ef5fe...
+    withdrawalInitiated:
+      name: withdrawal.initiated
+      title: withdrawal.initiated
+      summary: POST /v1/withdraw called
+      payload:
+        allOf:
+          - {$ref: '#/components/schemas/Envelope'}
+          - type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  user_id: {type: string}
+                  amount_pence: {type: integer}
+                  stripe_transfer: {type: string}
+    withdrawalFailed:
+      name: withdrawal.failed
+      title: withdrawal.failed
+      summary: Stripe transfer fails — balance restored
+      payload:
+        allOf:
+          - {$ref: '#/components/schemas/Envelope'}
+          - type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  user_id: {type: string}
+                  error: {type: string}
+                  record_id: {type: string}
+    agentCompleted:
+      name: agent.completed
+      title: agent.completed
+      summary: Agent task finishes
+      payload:
+        allOf:
+          - {$ref: '#/components/schemas/Envelope'}
+          - type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  task_id: {type: string}
+                  agent_id: {type: string}
+                  duration_ms: {type: integer}
+    agentFailed:
+      name: agent.failed
+      title: agent.failed
+      summary: Agent task exceeds retries
+      payload:
+        allOf:
+          - {$ref: '#/components/schemas/Envelope'}
+          - type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  task_id: {type: string}
+                  error: {type: string}
+                  retries: {type: integer}
+    signupCreated:
+      name: signup.created
+      title: signup.created
+      summary: New user signs up
+      payload:
+        allOf:
+          - {$ref: '#/components/schemas/Envelope'}
+          - type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  user_id: {type: string}
+                  referral_code: {type: string}
+    fraudBlocked:
+      name: fraud.blocked
+      title: fraud.blocked
+      summary: Payout blocked by fraud layer
+      payload:
+        allOf:
+          - {$ref: '#/components/schemas/Envelope'}
+          - type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  user_id: {type: string}
+                  reason: {type: string}
+                  risk_level: {type: string}
+x-registration:
+  endpoint: POST https://api.forcedream.ai/v1/webhooks
+  auth: 'Authorization: Bearer $FD_API_KEY'
+  body: {url: 'https://your-app.com/webhooks/forcedream', events: ['earn.completed', 'withdrawal.initiated'], secret: your_webhook_secret}
+  probe: GET https://api.forcedream.ai/v1/webhooks returned 200 (172 bytes) anonymously on 2026-09-19; the route exists.

@@ -1,0 +1,151 @@
+generated: '2026-09-19'
+method: searched
+source: >-
+  https://www.forcedream.com/developers/api, /developers/errors, /developers/rate-limits, /developers/security,
+  /developers/webhooks, /terms; github.com/forcedreamai/forcedream-docs (invoke, billing, security,
+  troubleshooting); github.com/forcedreamai/forcedream-a2a-agent/examples/retry-backoff.md; the live MCP
+  tools/list (forcedream_execute_plan.idempotency_key); response headers observed on api.forcedream.ai
+  2026-09-19; openapi/forcedream-ai-openapi.yml.
+description: >-
+  Cross-cutting runtime semantics of the ForceDream API, MCP server and A2A endpoint: authentication style,
+  idempotency, pagination, request tracing, versioning, error envelope, rate-limit signalling, and — because
+  every paid call moves real money — the reversibility of a write. Where the docs and the terms disagree, both
+  are quoted.
+
+base_url: https://api.forcedream.ai
+api_style: REST over HTTPS with JSON bodies; async invoke-then-poll for agent work; JSON-RPC 2.0 for MCP (/v1/mcp) and A2A (/v1/a2a/execute)
+
+authentication:
+  scheme: 'Authorization: Bearer <key>'
+  key_types:
+    - 'fd_live_ — metered billing key, required for any route that spends (invoke, procure-then-invoke, MCP paid tools)'
+    - 'sk_fd_{40 hex} — account-management key; "Distinct from live_key and not interchangeable with it" (agent card)'
+  oauth: OAuth 2.1 authorization code + PKCE for MCP clients; scopes mcp:invoke, mcp:tools (and agent.execute on the A2A card); RFC 7591 dynamic client registration, no pre-shared credential
+  self_service: POST /api/signup with an email issues both keys immediately; the A2A card publishes this as a self-service-credentials/v1 extension
+  docs: https://www.forcedream.com/developers/security
+  detail: authentication/forcedream-ai-authentication.yml
+
+idempotency:
+  supported: true
+  coverage: partial
+  scope:
+    - forcedream_execute_plan (MCP tool) — idempotency_key argument
+    - message/send on the A2A endpoint — replay keyed on messageId
+  mechanism: >-
+    Two documented mechanisms, neither on the plain REST invoke: (1) the MCP tool forcedream_execute_plan takes
+    an `idempotency_key` — "Pass an idempotency_key and the same logical request submitted twice produces one
+    execution, one settlement and one proof" — and (2) the A2A runtime's retry guidance states "every request
+    carries a real messageId. If a retry resubmits the exact same request, ForceDream's idempotency layer
+    returns the original task rather than creating a duplicate or double-charging -- confirmed live." The API
+    host also lists Idempotency-Key in Access-Control-Allow-Headers on every response, but no page documents
+    an Idempotency-Key header on POST /v1/agents/{slug}/invoke or POST /api/signup, so REST writes are not
+    counted as covered.
+  key_format: client-chosen stable string (MCP); the A2A messageId (UUID in the provider's own example)
+  retention: not stated
+  conflict_behavior: not stated
+  docs:
+    - https://github.com/forcedreamai/forcedream-a2a-agent/blob/main/examples/retry-backoff.md
+    - mcp/forcedream-ai-mcp-tools-list.json (forcedream_execute_plan)
+  evidence_probed: 'access-control-allow-headers: Authorization, Content-Type, Accept-Language, x-admin-key, Idempotency-Key (observed on api.forcedream.ai, 2026-09-19)'
+  charge_semantics: >-
+    Independently of idempotency, the billing model is charge-on-success only: "You are billed only when your
+    task completes successfully with schema-valid output. A failed, empty, or invalid result costs £0" and
+    "Honest declines and insufficient output are charged 0; never double-charges."
+
+pagination:
+  style: none
+  notes: >-
+    The list operations in the published contract (GET /v1/agents/list, GET /v1/agents/reliability, GET
+    /v1/marketplace/list) return the whole set in one array with a count; no limit/cursor/page parameters are
+    documented and none appear in the spec.
+
+field_expansion:
+  supported: false
+
+metadata:
+  supported: false
+  notes: No arbitrary metadata field is documented; invoke bodies carry task, priority, budget_pence / max_daily_spend_pence.
+
+request_tracing:
+  request_id_header: null
+  observed: x-cloud-trace-context (Google Frontend trace id on every response)
+  notes: Not documented as a support handle; task_id (wtask_...) and proof_id (wfbatch_...) are the identifiers the docs use.
+
+async_pattern:
+  style: enqueue-then-poll
+  create: 'POST /v1/agents/{slug}/invoke -> {status: pending, task_id}' 
+  poll: GET /v1/agents/{slug}/result/{task_id}
+  terminal_states: [completed, failed, dead_letter, frozen]
+  notes: >-
+    "polling the result endpoint triggers execution of that task — so poll frequency, not the cron, determines
+    how long you wait"; proofs can take "up to roughly 50 seconds to become fetchable after a task settles."
+  priority_tiers: {cheapest: 0.90x, balanced: 1.00x, fastest: 1.50x, quality: 1.75x}
+  priority_note: '"fastest and quality currently affect price only. They do not yet change actual execution priority or queue position" (forcedream-docs/invoke).'
+
+versioning:
+  scheme: path prefix (/v1/) for the API; semver for the MCP server (0.12.x) and SDKs (0.3.0); a platform release number (v38.70) on the changelog
+  mechanism: no version header; breaking changes are announced on the changelog
+  current: v1 (API path); platform v38.70 (17 August 2026)
+  detail: lifecycle/forcedream-ai-lifecycle.yml
+  changelog: changelog/forcedream-ai-changelog.yml
+
+error_envelope:
+  media_type: application/json
+  shape: '{ "error": string (machine-readable), "message"?: string, "detail"?: string, "path"?: string }'
+  rfc9457: false
+  jsonrpc: 'MCP/A2A errors are JSON-RPC 2.0 error objects; -32001 authentication_required carries a data.acquisition block'
+  detail: errors/forcedream-ai-problem-types.yml
+  docs: https://www.forcedream.com/developers/errors
+
+rate_limiting:
+  headers: [X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, Retry-After]
+  status: 429
+  observed: 'x-ratelimit-limit: 120 / x-ratelimit-remaining / x-ratelimit-reset (unix seconds) on the MCP endpoint; the REST 401 responses probed carried no rate-limit headers'
+  detail: rate-limits/forcedream-ai-rate-limits.yml
+  docs: https://www.forcedream.com/developers/rate-limits
+
+webhooks:
+  register: POST /v1/webhooks
+  signature_header: X-ForceDream-Signature (HMAC-SHA256 of the payload body with your webhook secret)
+  detail: asyncapi/forcedream-ai-webhooks-asyncapi.yml
+
+dry_run_mode:
+  status: partial
+  mechanism: forcedream_plan_work (MCP) / POST /v1/procure (REST) price and select without executing or charging; FORCEDREAM_SANDBOX=true and FD_MOCK_MODE return labelled mocks with no network call
+  detail: sandbox/forcedream-ai-sandbox.yml
+
+reversibility:
+  grade: documented
+  summary: >-
+    ForceDream's write surface is small and money-shaped. The primary write — commissioning an agent — is
+    made reversible-by-construction rather than by a reversal call: nothing is charged until validated output
+    exists, so a failed run costs nothing and there is no cancel operation to document. Genuine reversal
+    paths exist for credentials and data (key revocation, account erasure) and a refund route exists for the
+    payments product, but the terms make prepaid balance non-refundable and set only a dispute window, not a
+    refund window, so the grade stays at documented rather than verified.
+  surfaces:
+    - write: POST /v1/agents/{slug}/invoke (invokeAgent) / forcedream_execute_plan / A2A message/send
+      reversal: none — no cancel endpoint; charge is applied only on successful, schema-valid completion, so an in-flight or failed task never settles
+      window: not applicable (charge-on-success); "Disputed charges must be raised within 14 days to billing@forcedream.com" (Terms 8.5)
+      docs: https://github.com/forcedreamai/forcedream-docs/blob/main/docs/billing/README.md
+    - write: prepaid balance top-up (POST /api/checkout, POST /v1/credits/purchase)
+      reversal: 'refund only "where required by law or under Section 9" (Google Cloud Marketplace purchases, where Google handles refunds)'
+      window: none stated beyond the 14-day dispute window
+      docs: https://www.forcedream.com/terms
+    - write: POST /v1/payments/collect (payments product, prose reference only)
+      reversal: POST /v1/payments/refund ("Process a refund")
+      window: not stated
+      docs: https://www.forcedream.com/developers/api
+    - write: API key issuance
+      reversal: POST /v1/account/keys/revoke ("Immediate revocation"); recovery via POST /api/recover-key
+      window: immediate
+      docs: https://www.forcedream.com/trust/developer
+    - write: account / personal data
+      reversal: DELETE /api/user/data ("immediate anonymisation"); execution-record deletion by email, actioned within 30 days and irreversible (Terms 10.3)
+      window: '"We will action requests within 30 days" (Terms 10.3)'
+      docs: https://www.forcedream.com/trust/subprocessors
+    - write: withdrawal (POST /v1/withdraw/request)
+      reversal: 'automatic — "withdrawal.failed: Stripe transfer fails — balance restored" (webhooks page); no user-initiated cancel documented'
+      window: not stated
+      docs: https://www.forcedream.com/developers/webhooks
+  read_only_surface: false

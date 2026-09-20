@@ -1,0 +1,204 @@
+generated: '2026-09-19'
+method: searched
+source: https://github.com/forcedreamai
+sources:
+  - https://www.forcedream.com/developers/sdks
+  - https://github.com/forcedreamai (26 public repositories; forcedream-sdk-conformance says "all 12 ForceDream SDKs")
+  - registry metadata endpoints named per entry, all fetched unauthenticated on 2026-09-19
+description: >-
+  First-party ForceDream client libraries and tools. ForceDream publishes twelve SDKs under one GitHub account
+  (forcedreamai, "ForceDream", blog https://forcedream.ai), a Go CLI with a Homebrew tap, an MCP server, and a
+  LangChain integration. Seven of the SDKs are on a public registry and all seven sit at 0.3.0 released
+  2026-08-12/14, i.e. one coordinated release; five (Java, Kotlin, C#, Swift, Dart, Elixir) are source-only —
+  their READMEs say so explicitly ("Not yet published to Maven Central"), and Maven Central, NuGet, pub.dev and
+  hex.pm were each queried and returned 404. version/published are read from registry metadata; null means the
+  registry has no record, not that the check was skipped. The MCP server package moves independently of the
+  SDK set (0.12.2, 2026-08-21) and is the most recently released first-party package.
+packages:
+  - language: javascript
+    registry: npm
+    name: "@forcedream/sdk"
+    url: https://www.npmjs.com/package/@forcedream/sdk
+    source: https://github.com/forcedreamai/forcedream-sdk-js
+    install: npm install @forcedream/sdk
+    official: true
+    version: 0.3.0
+    published: '2026-08-12'
+    versions: [0.1.0, 0.2.0, 0.3.0]
+    registry_endpoint: https://registry.npmjs.org/@forcedream%2Fsdk
+    license: MIT
+  - language: javascript
+    registry: npm
+    name: "@forcedream/mcp-server"
+    url: https://www.npmjs.com/package/@forcedream/mcp-server
+    source: https://github.com/forcedreamai/forcedream-mcp
+    install: npx -y @forcedream/mcp-server
+    official: true
+    kind: mcp-server
+    version: 0.12.2
+    published: '2026-08-21'
+    versions: [0.8.0, 0.9.0, 0.9.1, 0.10.0, 0.11.0, 0.12.0, 0.12.1, 0.12.2]
+    bins: [mcp-server, fd-verify]
+    registry_endpoint: https://registry.npmjs.org/@forcedream%2Fmcp-server
+    license: MIT
+    note: Local stdio MCP server; complements the hosted https://api.forcedream.ai/v1/mcp. Also listed in the official MCP Registry as io.github.forcedreamai/mcp-server. fd-verify is a proof-verification CLI shipped in the same package.
+  - language: python
+    registry: pypi
+    name: forcedream
+    url: https://pypi.org/project/forcedream/
+    source: https://github.com/forcedreamai/forcedream-sdk-python
+    install: pip install forcedream
+    official: true
+    version: 0.3.0
+    published: '2026-08-12'
+    versions: [0.1.0, 0.2.0, 0.3.0]
+    registry_endpoint: https://pypi.org/pypi/forcedream/json
+    license: MIT
+    author: ForceDream
+  - language: python
+    registry: pypi
+    name: forcedream-langchain
+    url: https://pypi.org/project/forcedream-langchain/
+    source: https://github.com/forcedreamai/forcedream-langchain
+    install: pip install forcedream-langchain
+    official: true
+    kind: framework-integration
+    version: 0.1.0
+    published: '2026-08-09'
+    registry_endpoint: https://pypi.org/pypi/forcedream-langchain/json
+    note: LangChain tools wrapping discover/invoke/verify.
+  - language: go
+    registry: pkg.go.dev
+    name: github.com/forcedreamai/forcedream-sdk-go
+    url: https://pkg.go.dev/github.com/forcedreamai/forcedream-sdk-go
+    source: https://github.com/forcedreamai/forcedream-sdk-go
+    install: go get github.com/forcedreamai/forcedream-sdk-go
+    official: true
+    version: v0.3.0
+    published: '2026-08-12'
+    versions: [v0.1.0, v0.2.0, v0.3.0]
+    registry_endpoint: https://proxy.golang.org/github.com/forcedreamai/forcedream-sdk-go/@latest
+    note: The docs SDK page prints `go get github.com/forcedreamai/forcedream-go`; the module that actually exists and that the CLI imports is forcedream-sdk-go.
+  - language: php
+    registry: packagist
+    name: forcedream/forcedream
+    url: https://packagist.org/packages/forcedream/forcedream
+    source: https://github.com/forcedreamai/forcedream-sdk-php
+    install: composer require forcedream/forcedream
+    official: true
+    version: v0.3.0
+    published: '2026-08-12'
+    versions: [v0.2.0, v0.3.0]
+    registry_endpoint: https://repo.packagist.org/p2/forcedream/forcedream.json
+    license: MIT
+  - language: ruby
+    registry: rubygems
+    name: forcedream
+    url: https://rubygems.org/gems/forcedream
+    source: https://github.com/forcedreamai/forcedream-sdk-ruby
+    install: gem install forcedream
+    official: true
+    version: 0.3.0
+    published: '2026-08-14'
+    registry_endpoint: https://rubygems.org/api/v1/gems/forcedream.json
+    license: MIT
+    author: ForceDream Ltd
+  - language: rust
+    registry: crates.io
+    name: forcedream
+    url: https://crates.io/crates/forcedream
+    source: https://github.com/forcedreamai/forcedream-sdk-rust
+    install: cargo add forcedream
+    official: true
+    version: 0.3.0
+    published: '2026-08-12'
+    versions: [0.1.0, 0.2.0, 0.3.0]
+    registry_endpoint: https://crates.io/api/v1/crates/forcedream
+  - language: java
+    registry: none
+    name: ai.forcedream:forcedream-sdk
+    url: https://github.com/forcedreamai/forcedream-sdk-java
+    source: https://github.com/forcedreamai/forcedream-sdk-java
+    install: build from source (mvn install) — README says "Not yet published to Maven Central"
+    official: true
+    version: null
+    published: null
+    registry_endpoint: https://repo1.maven.org/maven2/ai/forcedream/ (404)
+    note: README declares coordinates ai.forcedream:forcedream-sdk:0.1.0 for a local install; no tags on the repo; Maven Central search returned nothing.
+  - language: kotlin
+    registry: none
+    name: forcedream-sdk-kotlin
+    url: https://github.com/forcedreamai/forcedream-sdk-kotlin
+    source: https://github.com/forcedreamai/forcedream-sdk-kotlin
+    install: build from source (Maven) — not on Maven Central
+    official: true
+    version: null
+    published: null
+    registry_endpoint: https://repo1.maven.org/maven2/ai/forcedream/ (404)
+  - language: csharp
+    registry: none
+    name: ForceDream
+    url: https://github.com/forcedreamai/forcedream-sdk-csharp
+    source: https://github.com/forcedreamai/forcedream-sdk-csharp
+    install: source only — README shows <PackageReference Include="ForceDream" Version="0.1.0" /> but the package is not on NuGet
+    official: true
+    version: null
+    published: null
+    registry_endpoint: https://api.nuget.org/v3-flatcontainer/forcedream/index.json (404)
+  - language: swift
+    registry: swift-package-manager
+    name: forcedream-sdk-swift
+    url: https://github.com/forcedreamai/forcedream-sdk-swift
+    source: https://github.com/forcedreamai/forcedream-sdk-swift
+    install: '.package(url: "https://github.com/forcedreamai/forcedream-sdk-swift.git", from: "0.1.0")'
+    official: true
+    version: null
+    published: null
+    note: 'SPM resolves from git tags; the repository has no tags, so from: "0.1.0" as printed in the README cannot resolve. No registry to query.' 
+  - language: dart
+    registry: none
+    name: forcedream
+    url: https://github.com/forcedreamai/forcedream-sdk-dart
+    source: https://github.com/forcedreamai/forcedream-sdk-dart
+    install: git dependency — not on pub.dev
+    official: true
+    version: null
+    published: null
+    registry_endpoint: https://pub.dev/api/packages/forcedream (404)
+  - language: elixir
+    registry: none
+    name: forcedream
+    url: https://github.com/forcedreamai/forcedream-sdk-elixir
+    source: https://github.com/forcedreamai/forcedream-sdk-elixir
+    install: '{:forcedream, git: "https://github.com/forcedreamai/forcedream-sdk-elixir.git"}'
+    official: true
+    version: null
+    published: null
+    registry_endpoint: https://hex.pm/api/packages/forcedream (404)
+  - language: go
+    registry: homebrew-tap
+    name: forcedreamai/forcedream/forcedream
+    url: https://github.com/forcedreamai/homebrew-forcedream
+    source: https://github.com/forcedreamai/forcedream-cli
+    install: brew install forcedreamai/forcedream/forcedream
+    official: true
+    kind: cli
+    version: v0.3.0
+    published: '2026-07-15'
+    versions: [v0.1.0, v0.2.0, v0.3.0]
+    registry_endpoint: https://api.github.com/repos/forcedreamai/forcedream-cli/releases
+    note: The formula builds from the v0.3.0 source tarball (sha256 pinned); GitHub releases carry no binary assets. Command surface in cli/forcedream-ai-cli.yml.
+related_repositories:
+  - {name: forcedream-sdk-conformance, url: https://github.com/forcedreamai/forcedream-sdk-conformance, note: Cross-language conformance suite validating all 12 SDKs against one Ed25519 verification contract (fixtures + harnesses).}
+  - {name: forcedream-openapi, url: https://github.com/forcedreamai/forcedream-openapi, note: The SDK-verified OpenAPI 3.1 wired in apis.yml.}
+  - {name: forcedream-a2a-agent, url: https://github.com/forcedreamai/forcedream-a2a-agent, note: A2A runtime README + agent-card.json (older 1-skill copy).}
+  - {name: forcedream-examples, url: https://github.com/forcedreamai/forcedream-examples}
+  - {name: forcedream-nextjs-example, url: https://github.com/forcedreamai/forcedream-nextjs-example}
+  - {name: forcedream-adk-example, url: https://github.com/forcedreamai/forcedream-adk-example}
+  - {name: forcedream-docs, url: https://github.com/forcedreamai/forcedream-docs, note: Markdown developer hub (getting-started, invoke, billing, security, verification, troubleshooting).}
+summary:
+  official_sdks: 12
+  on_a_public_registry: 7
+  source_only: 5
+  latest_sdk_release: '2026-08-14'
+  latest_any_release: '2026-08-21'
