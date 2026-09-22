@@ -30,7 +30,7 @@ tags:
 - Cryptographic Proofs
 - AI Inference Routing
 - Agent Payments
-- Agent Commerce
+- Agentic Commerce
 - agent-native
 - United Kingdom
 tags_raw:
@@ -44,6 +44,7 @@ tags_raw:
 - Agent commerce
 - Agent-native
 - United Kingdom
+- Agent Commerce
 apis:
 - aid: forcedream-ai:forcedream-api
   name: ForceDream API
