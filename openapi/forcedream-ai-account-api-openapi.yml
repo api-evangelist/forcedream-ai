@@ -1,0 +1,78 @@
+openapi: 3.2.0
+info:
+  title: ForceDream API (SDK-verified surface) Account API
+  version: 0.1.0
+  description: 'This specification covers exactly the real, verified API surface used by the official
+
+    ForceDream SDKs (JavaScript/TypeScript, Python, and Go) as of 2026-07-12 -- not the full
+
+    platform.'
+  license:
+    name: MIT
+servers:
+- url: https://api.forcedream.ai
+  description: Production (the only environment tested)
+tags:
+- name: Account
+paths:
+  /v1/account/balance:
+    get:
+      operationId: getBalance
+      summary: Get the real, current account balance
+      security:
+      - bearerAuth: []
+      responses:
+        '200':
+          description: Current balance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BalanceResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - Account
+components:
+  responses:
+    Unauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Invalid API key (401).
+  schemas:
+    BalanceResult:
+      type: object
+      properties:
+        user_id:
+          type: string
+        balance:
+          type: object
+          properties:
+            pence:
+              type: integer
+            gbp:
+              type: string
+            withdrawable:
+              type: boolean
+        total_calls:
+          type: integer
+        earnings_pct:
+          type: integer
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: An `fd_live_` billing key (from signup) or `sk_fd_` account key.
+x-forcedream-canonicalization:
+  description: Non-standard OpenAPI extension documenting the exact, real canonicalization algorithm, since OpenAPI itself has no native way to express this. Cross-tested byte-for-byte and hash-for-hash across JavaScript, Python, and Go before any SDK trusted it -- not assumed.
+  algorithm:
+    step_1_build_signable: From an FdProof, construct an object with keys task_id, agent_id, input_hash, output_hash, cost_pence (Number-coerced), budget_pence (Number-coerced), started_at (Number-coerced), completed_at (String-coerced). If external_cost_hash is present (non-null), also add external_cost_hash (String-coerced) and retrieved_count (Number-coerced, defaulting to 0) -- 10 fields total instead of 8.
+    step_2_canonicalize: Sort the signable object's keys alphabetically, then serialize as compact JSON with no whitespace after ':' or ','. Equivalent to JavaScript's JSON.stringify(obj, Object.keys(obj).sort()).
+    step_3_digest: SHA-256 hash the canonical string, encoded as lowercase hex.
+    step_4_verify: Base64-decode the proof's signature field. Hex-decode the digest to raw bytes. Verify the Ed25519 signature (raw bytes of the digest as the message) against the public key from GET /v1/workforce/proof/public-key.
+  number_coercion_note: '"Number-coerced" must match JavaScript''s Number(x) -> JSON.stringify behavior exactly: whole-valued numbers serialize without a decimal point; fractional values keep full precision. A naive language-native int() cast (as first attempted in the Python SDK build) truncates fractional values and silently breaks verification. A naive %v-style generic formatter (as first attempted in the Go SDK build) can produce scientific notation for large values and silently breaks verification. Both were caught only by direct cross-language digest comparison, not by inspection.'

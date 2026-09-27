@@ -1,0 +1,83 @@
+openapi: 3.2.0
+info:
+  title: ForceDream API (SDK-verified surface) Signup API
+  version: 0.1.0
+  description: 'This specification covers exactly the real, verified API surface used by the official
+
+    ForceDream SDKs (JavaScript/TypeScript, Python, and Go) as of 2026-07-12 -- not the full
+
+    platform.'
+  license:
+    name: MIT
+servers:
+- url: https://api.forcedream.ai
+  description: Production (the only environment tested)
+tags:
+- name: Signup
+paths:
+  /api/signup:
+    post:
+      operationId: signup
+      summary: Create a new ForceDream account
+      description: 'No API key required -- this is how you get one. Returns a real `fd_live_` billing key
+
+        with a small, real trial balance already seeded. Verified live, repeatedly, across all
+
+        three SDKs tonight.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                marketing_consent:
+                  type: boolean
+                  default: false
+                  description: Explicit opt-in only. Defaults to false -- an email address existing because someone signed up is never treated as consent to be contacted.
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignupResult'
+      tags:
+      - Signup
+components:
+  schemas:
+    SignupResult:
+      type: object
+      properties:
+        api_key:
+          type: string
+        user_id:
+          type: string
+        live_key:
+          type: string
+        trial_balance_pence:
+          type: integer
+        trial_balance_gbp:
+          type: string
+        referral_code:
+          type: string
+        message:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: An `fd_live_` billing key (from signup) or `sk_fd_` account key.
+x-forcedream-canonicalization:
+  description: Non-standard OpenAPI extension documenting the exact, real canonicalization algorithm, since OpenAPI itself has no native way to express this. Cross-tested byte-for-byte and hash-for-hash across JavaScript, Python, and Go before any SDK trusted it -- not assumed.
+  algorithm:
+    step_1_build_signable: From an FdProof, construct an object with keys task_id, agent_id, input_hash, output_hash, cost_pence (Number-coerced), budget_pence (Number-coerced), started_at (Number-coerced), completed_at (String-coerced). If external_cost_hash is present (non-null), also add external_cost_hash (String-coerced) and retrieved_count (Number-coerced, defaulting to 0) -- 10 fields total instead of 8.
+    step_2_canonicalize: Sort the signable object's keys alphabetically, then serialize as compact JSON with no whitespace after ':' or ','. Equivalent to JavaScript's JSON.stringify(obj, Object.keys(obj).sort()).
+    step_3_digest: SHA-256 hash the canonical string, encoded as lowercase hex.
+    step_4_verify: Base64-decode the proof's signature field. Hex-decode the digest to raw bytes. Verify the Ed25519 signature (raw bytes of the digest as the message) against the public key from GET /v1/workforce/proof/public-key.
+  number_coercion_note: '"Number-coerced" must match JavaScript''s Number(x) -> JSON.stringify behavior exactly: whole-valued numbers serialize without a decimal point; fractional values keep full precision. A naive language-native int() cast (as first attempted in the Python SDK build) truncates fractional values and silently breaks verification. A naive %v-style generic formatter (as first attempted in the Go SDK build) can produce scientific notation for large values and silently breaks verification. Both were caught only by direct cross-language digest comparison, not by inspection.'
