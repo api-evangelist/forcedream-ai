@@ -131,6 +131,22 @@ paths:
       - Agents
 components:
   schemas:
+    AgentReliability:
+      type: object
+      nullable: true
+      description: Honestly null where no real reliability data exists yet.
+      properties:
+        success_rate:
+          type: number
+          nullable: true
+        avg_latency_ms:
+          type: number
+          nullable: true
+        sample_size:
+          type: integer
+        note:
+          type: string
+          nullable: true
     Agent:
       type: object
       properties:
@@ -215,22 +231,6 @@ components:
           type: string
         message:
           type: string
-    AgentReliability:
-      type: object
-      nullable: true
-      description: Honestly null where no real reliability data exists yet.
-      properties:
-        success_rate:
-          type: number
-          nullable: true
-        avg_latency_ms:
-          type: number
-          nullable: true
-        sample_size:
-          type: integer
-        note:
-          type: string
-          nullable: true
   responses:
     Unauthorized:
       description: Invalid or missing API key

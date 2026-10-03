@@ -1,7 +1,7 @@
 {
   "provider": "forcedream-ai",
   "sources": [
-    "forcedream-ai-openapi.yml"
+    "_original/forcedream-ai-openapi.yml"
   ],
   "outputs": [
     "forcedream-ai-account-api-openapi.yml",
@@ -9,12 +9,11 @@
     "forcedream-ai-signup-api-openapi.yml",
     "forcedream-ai-workforce-api-openapi.yml"
   ],
-  "archived": [
-    "archived openapi/forcedream-ai-openapi.yml"
-  ],
+  "archived": [],
   "errors": [],
   "warnings": [],
   "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
     "forcedream-ai-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
     "forcedream-ai-openapi.yml: tagged paths POST /api/signup -> Signup",
     "forcedream-ai-openapi.yml: tagged paths GET /v1/account/balance -> Account",
@@ -28,7 +27,12 @@
     "forcedream-ai-openapi.yml: declared missing tag: Agents",
     "forcedream-ai-openapi.yml: declared missing tag: Signup",
     "forcedream-ai-openapi.yml: declared missing tag: Workforce",
-    "apis.yml register: written (+4 apis, 6 total)"
+    "apis.yml register: already-registered"
   ],
-  "skipped": []
+  "skipped": [
+    "forcedream-ai-account-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "forcedream-ai-agents-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "forcedream-ai-signup-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "forcedream-ai-workforce-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }
