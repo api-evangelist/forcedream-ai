@@ -131,6 +131,29 @@ paths:
       - Agents
 components:
   schemas:
+    AgentListResult:
+      type: object
+      properties:
+        count:
+          type: integer
+        agents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Agent'
+        note:
+          type: string
+    ReliabilityListResult:
+      type: object
+      properties:
+        agents:
+          type: array
+          items:
+            type: object
+            properties:
+              agent_slug:
+                type: string
+              reliability:
+                $ref: '#/components/schemas/AgentReliability'
     AgentReliability:
       type: object
       nullable: true
@@ -168,45 +191,6 @@ components:
           $ref: '#/components/schemas/AgentMetrics'
         health:
           $ref: '#/components/schemas/AgentReliability'
-    AgentMetrics:
-      type: object
-      description: System-derived from proofs/ledger. Never self-reported.
-      properties:
-        proof_count:
-          type: integer
-        tasks_completed:
-          type: integer
-        tasks_attempted:
-          type: integer
-        success_rate:
-          type: number
-        revenue_earned_pence:
-          type: integer
-        avg_cost_pence:
-          type: number
-    ReliabilityListResult:
-      type: object
-      properties:
-        agents:
-          type: array
-          items:
-            type: object
-            properties:
-              agent_slug:
-                type: string
-              reliability:
-                $ref: '#/components/schemas/AgentReliability'
-    AgentListResult:
-      type: object
-      properties:
-        count:
-          type: integer
-        agents:
-          type: array
-          items:
-            $ref: '#/components/schemas/Agent'
-        note:
-          type: string
     InvokeResult:
       type: object
       properties:
@@ -231,6 +215,22 @@ components:
           type: string
         message:
           type: string
+    AgentMetrics:
+      type: object
+      description: System-derived from proofs/ledger. Never self-reported.
+      properties:
+        proof_count:
+          type: integer
+        tasks_completed:
+          type: integer
+        tasks_attempted:
+          type: integer
+        success_rate:
+          type: number
+        revenue_earned_pence:
+          type: integer
+        avg_cost_pence:
+          type: number
   responses:
     Unauthorized:
       description: Invalid or missing API key

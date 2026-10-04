@@ -33,17 +33,6 @@ paths:
       tags:
       - Account
 components:
-  responses:
-    Unauthorized:
-      description: Invalid or missing API key
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              error:
-                type: string
-                example: Invalid API key (401).
   schemas:
     BalanceResult:
       type: object
@@ -63,6 +52,17 @@ components:
           type: integer
         earnings_pct:
           type: integer
+  responses:
+    Unauthorized:
+      description: Invalid or missing API key
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Invalid API key (401).
   securitySchemes:
     bearerAuth:
       type: http
