@@ -193,6 +193,8 @@ apis:
   humanURL: https://www.forcedream.com/developers/api
   baseURL: https://api.forcedream.ai
   tags:
+  - Sign Up
+  tags_raw:
   - Signup
   properties:
   - type: OpenAPI
