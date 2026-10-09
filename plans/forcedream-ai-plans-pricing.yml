@@ -144,3 +144,52 @@ withdrawals:
   minimum: £5
   rails: [Stripe Connect, M-Pesa, Payoneer]
   timing: '"Funds arrive within 1 business day"'
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - subscription
+  units:
+  - request
+  - token
+  plans:
+  - name: Free
+    access: other
+    model: subscription
+    model_how: stated
+    units:
+    - other
+    - request
+    - token
+    periods:
+    - month
+  - name: Starter
+    access: other
+    model: subscription
+    model_how: stated
+    units:
+    - other
+    - request
+    - token
+    periods:
+    - month
+  - name: Pro
+    access: other
+    model: subscription
+    model_how: stated
+    units:
+    - other
+    - request
+    - token
+    periods:
+    - month
+  - name: Scale
+    access: other
+    model: subscription
+    model_how: stated
+    units:
+    - other
+    - request
+    - token
+    periods:
+    - month
