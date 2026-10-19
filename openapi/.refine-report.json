@@ -1,38 +1,34 @@
 {
   "provider": "forcedream-ai",
   "sources": [
-    "_original/forcedream-ai-openapi.yml"
+    "_original/forcedream-ai-openapi.json"
   ],
   "outputs": [
-    "forcedream-ai-account-api-openapi.yml",
-    "forcedream-ai-agents-api-openapi.yml",
-    "forcedream-ai-signup-api-openapi.yml",
-    "forcedream-ai-workforce-api-openapi.yml"
+    "forcedream-ai-oracle-api-openapi.yml"
   ],
   "archived": [],
   "errors": [],
   "warnings": [],
   "notes": [
     "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
-    "forcedream-ai-openapi.yml: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
-    "forcedream-ai-openapi.yml: tagged paths POST /api/signup -> Signup",
-    "forcedream-ai-openapi.yml: tagged paths GET /v1/account/balance -> Account",
-    "forcedream-ai-openapi.yml: tagged paths GET /v1/agents/list -> Agents",
-    "forcedream-ai-openapi.yml: tagged paths GET /v1/agents/reliability -> Agents",
-    "forcedream-ai-openapi.yml: tagged paths POST /v1/agents/{slug}/invoke -> Agents",
-    "forcedream-ai-openapi.yml: tagged paths GET /v1/agents/{slug}/result/{taskId} -> Agents",
-    "forcedream-ai-openapi.yml: tagged paths GET /v1/workforce/proof/public-key -> Workforce",
-    "forcedream-ai-openapi.yml: tagged paths GET /v1/workforce/proof/{task_id}/public -> Workforce",
-    "forcedream-ai-openapi.yml: declared missing tag: Account",
-    "forcedream-ai-openapi.yml: declared missing tag: Agents",
-    "forcedream-ai-openapi.yml: declared missing tag: Signup",
-    "forcedream-ai-openapi.yml: declared missing tag: Workforce",
-    "apis.yml register: already-registered"
+    "forcedream-ai-openapi.json: upgraded openapi 3.0.0 -> OpenAPI 3.2.0",
+    "forcedream-ai-openapi.json: tagged paths POST /v1/oracle/semantic_cache -> Oracle",
+    "forcedream-ai-openapi.json: tagged paths POST /v1/oracle/sentiment_feed -> Oracle",
+    "forcedream-ai-openapi.json: tagged paths POST /v1/oracle/fraud_signal -> Oracle",
+    "forcedream-ai-openapi.json: tagged paths POST /v1/oracle/tax_jar_lookup -> Oracle",
+    "forcedream-ai-openapi.json: tagged paths POST /v1/oracle/lead_score -> Oracle",
+    "forcedream-ai-openapi.json: tagged paths POST /v1/oracle/prompt_template -> Oracle",
+    "forcedream-ai-openapi.json: tagged paths POST /v1/oracle/classification -> Oracle",
+    "forcedream-ai-openapi.json: tagged paths POST /v1/oracle/summarization -> Oracle",
+    "forcedream-ai-openapi.json: tagged paths POST /v1/oracle/translation -> Oracle",
+    "forcedream-ai-openapi.json: tagged paths POST /v1/oracle/model_inference -> Oracle",
+    "forcedream-ai-openapi.json: tagged paths POST /v1/oracle/anomaly_detection -> Oracle",
+    "forcedream-ai-openapi.json: tagged paths POST /v1/oracle/security_scan -> Oracle",
+    "forcedream-ai-openapi.json: tagged paths POST /v1/oracle/validation -> Oracle",
+    "forcedream-ai-openapi.json: tagged paths POST /v1/oracle/code_generation -> Oracle",
+    "forcedream-ai-openapi.json: tagged paths POST /v1/oracle/proof_of_work -> Oracle",
+    "forcedream-ai-openapi.json: declared missing tag: Oracle",
+    "apis.yml register: written (+1 apis, 3 total)"
   ],
-  "skipped": [
-    "forcedream-ai-account-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "forcedream-ai-agents-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "forcedream-ai-signup-api-openapi.yml: previously refined output, superseded by openapi/_original/",
-    "forcedream-ai-workforce-api-openapi.yml: previously refined output, superseded by openapi/_original/"
-  ]
+  "skipped": []
 }

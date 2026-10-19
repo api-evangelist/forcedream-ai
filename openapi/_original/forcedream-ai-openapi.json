@@ -1,0 +1,600 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ForceDream Data Oracle",
+    "version": "1.0.0",
+    "description": "33 M2M data bridges. HTTP 402 + Stripe payment."
+  },
+  "servers": [
+    {
+      "url": "https://YOUR-NGROK-URL.ngrok-free.app"
+    }
+  ],
+  "paths": {
+    "/v1/oracle/semantic_cache": {
+      "post": {
+        "operationId": "semantic_cache",
+        "summary": "Cached LLM embeddings (\u00a30.05)",
+        "description": "Returns HTTP 402 with payment link if no payment. Include X-Payment-Intent-Id after paying.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Payment-Intent-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resource_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data returned after payment"
+          },
+          "402": {
+            "description": "Payment required \u2014 see payment.payment_link"
+          }
+        }
+      }
+    },
+    "/v1/oracle/sentiment_feed": {
+      "post": {
+        "operationId": "sentiment_feed",
+        "summary": "Market sentiment (\u00a30.10)",
+        "description": "Returns HTTP 402 with payment link if no payment. Include X-Payment-Intent-Id after paying.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Payment-Intent-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resource_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data returned after payment"
+          },
+          "402": {
+            "description": "Payment required \u2014 see payment.payment_link"
+          }
+        }
+      }
+    },
+    "/v1/oracle/fraud_signal": {
+      "post": {
+        "operationId": "fraud_signal",
+        "summary": "Fraud IP check (\u00a30.02)",
+        "description": "Returns HTTP 402 with payment link if no payment. Include X-Payment-Intent-Id after paying.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Payment-Intent-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resource_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data returned after payment"
+          },
+          "402": {
+            "description": "Payment required \u2014 see payment.payment_link"
+          }
+        }
+      }
+    },
+    "/v1/oracle/tax_jar_lookup": {
+      "post": {
+        "operationId": "tax_jar_lookup",
+        "summary": "Tax rate (\u00a30.01)",
+        "description": "Returns HTTP 402 with payment link if no payment. Include X-Payment-Intent-Id after paying.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Payment-Intent-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resource_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data returned after payment"
+          },
+          "402": {
+            "description": "Payment required \u2014 see payment.payment_link"
+          }
+        }
+      }
+    },
+    "/v1/oracle/lead_score": {
+      "post": {
+        "operationId": "lead_score",
+        "summary": "Lead quality score (\u00a30.50)",
+        "description": "Returns HTTP 402 with payment link if no payment. Include X-Payment-Intent-Id after paying.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Payment-Intent-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resource_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data returned after payment"
+          },
+          "402": {
+            "description": "Payment required \u2014 see payment.payment_link"
+          }
+        }
+      }
+    },
+    "/v1/oracle/prompt_template": {
+      "post": {
+        "operationId": "prompt_template",
+        "summary": "Optimised prompts (\u00a30.25)",
+        "description": "Returns HTTP 402 with payment link if no payment. Include X-Payment-Intent-Id after paying.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Payment-Intent-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resource_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data returned after payment"
+          },
+          "402": {
+            "description": "Payment required \u2014 see payment.payment_link"
+          }
+        }
+      }
+    },
+    "/v1/oracle/classification": {
+      "post": {
+        "operationId": "classification",
+        "summary": "Text classification (\u00a30.05)",
+        "description": "Returns HTTP 402 with payment link if no payment. Include X-Payment-Intent-Id after paying.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Payment-Intent-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resource_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data returned after payment"
+          },
+          "402": {
+            "description": "Payment required \u2014 see payment.payment_link"
+          }
+        }
+      }
+    },
+    "/v1/oracle/summarization": {
+      "post": {
+        "operationId": "summarization",
+        "summary": "Document summary (\u00a30.10)",
+        "description": "Returns HTTP 402 with payment link if no payment. Include X-Payment-Intent-Id after paying.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Payment-Intent-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resource_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data returned after payment"
+          },
+          "402": {
+            "description": "Payment required \u2014 see payment.payment_link"
+          }
+        }
+      }
+    },
+    "/v1/oracle/translation": {
+      "post": {
+        "operationId": "translation",
+        "summary": "Language translation (\u00a30.08)",
+        "description": "Returns HTTP 402 with payment link if no payment. Include X-Payment-Intent-Id after paying.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Payment-Intent-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resource_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data returned after payment"
+          },
+          "402": {
+            "description": "Payment required \u2014 see payment.payment_link"
+          }
+        }
+      }
+    },
+    "/v1/oracle/model_inference": {
+      "post": {
+        "operationId": "model_inference",
+        "summary": "LLM inference (\u00a30.10)",
+        "description": "Returns HTTP 402 with payment link if no payment. Include X-Payment-Intent-Id after paying.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Payment-Intent-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resource_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data returned after payment"
+          },
+          "402": {
+            "description": "Payment required \u2014 see payment.payment_link"
+          }
+        }
+      }
+    },
+    "/v1/oracle/anomaly_detection": {
+      "post": {
+        "operationId": "anomaly_detection",
+        "summary": "Outlier detection (\u00a30.30)",
+        "description": "Returns HTTP 402 with payment link if no payment. Include X-Payment-Intent-Id after paying.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Payment-Intent-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resource_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data returned after payment"
+          },
+          "402": {
+            "description": "Payment required \u2014 see payment.payment_link"
+          }
+        }
+      }
+    },
+    "/v1/oracle/security_scan": {
+      "post": {
+        "operationId": "security_scan",
+        "summary": "Vulnerability scan (\u00a30.75)",
+        "description": "Returns HTTP 402 with payment link if no payment. Include X-Payment-Intent-Id after paying.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Payment-Intent-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resource_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data returned after payment"
+          },
+          "402": {
+            "description": "Payment required \u2014 see payment.payment_link"
+          }
+        }
+      }
+    },
+    "/v1/oracle/validation": {
+      "post": {
+        "operationId": "validation",
+        "summary": "Output verification (\u00a30.15)",
+        "description": "Returns HTTP 402 with payment link if no payment. Include X-Payment-Intent-Id after paying.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Payment-Intent-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resource_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data returned after payment"
+          },
+          "402": {
+            "description": "Payment required \u2014 see payment.payment_link"
+          }
+        }
+      }
+    },
+    "/v1/oracle/code_generation": {
+      "post": {
+        "operationId": "code_generation",
+        "summary": "Code writing (\u00a30.50)",
+        "description": "Returns HTTP 402 with payment link if no payment. Include X-Payment-Intent-Id after paying.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Payment-Intent-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resource_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data returned after payment"
+          },
+          "402": {
+            "description": "Payment required \u2014 see payment.payment_link"
+          }
+        }
+      }
+    },
+    "/v1/oracle/proof_of_work": {
+      "post": {
+        "operationId": "proof_of_work",
+        "summary": "WORM task verification (\u00a30.20)",
+        "description": "Returns HTTP 402 with payment link if no payment. Include X-Payment-Intent-Id after paying.",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "X-Payment-Intent-Id",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "resource_id": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Data returned after payment"
+          },
+          "402": {
+            "description": "Payment required \u2014 see payment.payment_link"
+          }
+        }
+      }
+    }
+  }
+}

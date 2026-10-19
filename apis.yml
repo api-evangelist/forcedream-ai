@@ -131,102 +131,16 @@ apis:
     url: https://api.forcedream.ai/.well-known/agent-card.json
   - type: Documentation
     url: https://github.com/forcedreamai/forcedream-a2a-agent
-- aid: forcedream-ai:forcedream-ai-account-api
-  name: ForceDream Account API
-  description: The Account API from ForceDream — 1 operation(s) for account.
-  humanURL: https://www.forcedream.com/developers/api
-  baseURL: https://api.forcedream.ai
+- aid: forcedream-ai:forcedream-ai-oracle-api
+  name: ForceDream Oracle API
+  description: The Oracle API from ForceDream — 15 operation(s) for oracle.
+  humanURL: https://forcedream.ai/mcp
+  baseURL: https://api.forcedream.ai/v1/mcp
   tags:
-  - Account
+  - Oracle
   properties:
   - type: OpenAPI
-    url: openapi/forcedream-ai-account-api-openapi.yml
-  - type: Documentation
-    url: https://www.forcedream.com/developers/docs
-  - type: APIReference
-    url: https://www.forcedream.com/developers/api
-  - type: GettingStarted
-    url: https://www.forcedream.com/developers/quickstart
-  - type: AsyncAPI
-    url: asyncapi/forcedream-ai-webhooks-asyncapi.yml
-  - type: Webhooks
-    url: asyncapi/forcedream-ai-webhooks-asyncapi.yml
-  - type: Webhooks
-    url: https://www.forcedream.com/developers/webhooks
-  - type: ErrorCatalog
-    url: errors/forcedream-ai-problem-types.yml
-  - type: RateLimits
-    url: rate-limits/forcedream-ai-rate-limits.yml
-  - type: DataModel
-    url: data-model/forcedream-ai-data-model.yml
-- aid: forcedream-ai:forcedream-ai-agents-api
-  name: ForceDream Agents API
-  description: The Agents API from ForceDream — 4 operation(s) for agents.
-  humanURL: https://www.forcedream.com/developers/api
-  baseURL: https://api.forcedream.ai
-  tags:
-  - Agents
-  properties:
-  - type: OpenAPI
-    url: openapi/forcedream-ai-agents-api-openapi.yml
-  - type: Documentation
-    url: https://www.forcedream.com/developers/docs
-  - type: APIReference
-    url: https://www.forcedream.com/developers/api
-  - type: GettingStarted
-    url: https://www.forcedream.com/developers/quickstart
-  - type: AsyncAPI
-    url: asyncapi/forcedream-ai-webhooks-asyncapi.yml
-  - type: Webhooks
-    url: asyncapi/forcedream-ai-webhooks-asyncapi.yml
-  - type: Webhooks
-    url: https://www.forcedream.com/developers/webhooks
-  - type: ErrorCatalog
-    url: errors/forcedream-ai-problem-types.yml
-  - type: RateLimits
-    url: rate-limits/forcedream-ai-rate-limits.yml
-  - type: DataModel
-    url: data-model/forcedream-ai-data-model.yml
-- aid: forcedream-ai:forcedream-ai-signup-api
-  name: ForceDream Signup API
-  description: The Signup API from ForceDream — 1 operation(s) for signup.
-  humanURL: https://www.forcedream.com/developers/api
-  baseURL: https://api.forcedream.ai
-  tags:
-  - Sign Up
-  tags_raw:
-  - Signup
-  properties:
-  - type: OpenAPI
-    url: openapi/forcedream-ai-signup-api-openapi.yml
-  - type: Documentation
-    url: https://www.forcedream.com/developers/docs
-  - type: APIReference
-    url: https://www.forcedream.com/developers/api
-  - type: GettingStarted
-    url: https://www.forcedream.com/developers/quickstart
-  - type: AsyncAPI
-    url: asyncapi/forcedream-ai-webhooks-asyncapi.yml
-  - type: Webhooks
-    url: asyncapi/forcedream-ai-webhooks-asyncapi.yml
-  - type: Webhooks
-    url: https://www.forcedream.com/developers/webhooks
-  - type: ErrorCatalog
-    url: errors/forcedream-ai-problem-types.yml
-  - type: RateLimits
-    url: rate-limits/forcedream-ai-rate-limits.yml
-  - type: DataModel
-    url: data-model/forcedream-ai-data-model.yml
-- aid: forcedream-ai:forcedream-ai-workforce-api
-  name: ForceDream Workforce API
-  description: The Workforce API from ForceDream — 2 operation(s) for workforce.
-  humanURL: https://www.forcedream.com/developers/api
-  baseURL: https://api.forcedream.ai
-  tags:
-  - Workforce
-  properties:
-  - type: OpenAPI
-    url: openapi/forcedream-ai-workforce-api-openapi.yml
+    url: openapi/forcedream-ai-oracle-api-openapi.yml
   - type: Documentation
     url: https://www.forcedream.com/developers/docs
   - type: APIReference
