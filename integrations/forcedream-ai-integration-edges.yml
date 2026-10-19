@@ -99,10 +99,137 @@ edges:
     detected: '2026-10-15'
   detected_by: sweep-ai-agents.py
   first_seen: '2026-10-15'
+- partner_name: crates.io
+  partner: crates-io
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (Rust)
+  evidence: https://crates.io/crates/forcedream
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: crates.io (public registry JSON)
+    spec_file: null
+    language: Rust
+    packages:
+    - name: forcedream
+      version: 0.3.0
+      released: '2026-08-12'
+      released_field: updated_at
+      lapsed: false
+      page: https://crates.io/crates/forcedream
+      repo_leg: github-org:forcedreamai
+      publisher_leg: org:forcedreamai
+      matched_by: github-org
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+- partner_name: Go module proxy
+  partner: null
+  partner_match: null
+  type: register
+  direction: provider-built
+  category: official SDK (Go)
+  evidence: https://pkg.go.dev/github.com/forcedreamai/forcedream-sdk-go
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: Go module proxy (public registry JSON)
+    spec_file: null
+    language: Go
+    packages:
+    - name: github.com/forcedreamai/forcedream-sdk-go
+      version: v0.3.0
+      released: '2026-08-12'
+      released_field: Time
+      lapsed: false
+      page: https://pkg.go.dev/github.com/forcedreamai/forcedream-sdk-go
+      repo_leg: github-org:forcedreamai
+      publisher_leg: org:forcedreamai
+      matched_by: github-org
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+- partner_name: npm registry
+  partner: npm
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (JavaScript/TypeScript)
+  evidence: https://www.npmjs.com/package/@forcedream/sdk
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: npm registry (public registry JSON)
+    spec_file: null
+    language: JavaScript/TypeScript
+    packages:
+    - name: '@forcedream/sdk'
+      version: 0.3.0
+      released: '2026-08-12'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@forcedream/sdk
+      repo_leg: domain:forcedream.ai
+      publisher_leg: org:forcedream
+      matched_by: domain
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+- partner_name: RubyGems
+  partner: rubygems
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (Ruby)
+  evidence: https://rubygems.org/gems/forcedream
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: RubyGems (public registry JSON)
+    spec_file: null
+    language: Ruby
+    packages:
+    - name: forcedream
+      version: 0.3.0
+      released: '2026-08-14'
+      released_field: version_created_at
+      lapsed: false
+      page: https://rubygems.org/gems/forcedream
+      repo_leg: github-org:forcedreamai
+      publisher_leg: org:forcedream
+      matched_by: github-org
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
 generated: '2026-10-14'
 method: searched
 checked:
 - https://a2aregistry.org/api/agents
+- https://api.nuget.org/v3
+- https://crates.io/api/v1
+- https://proxy.golang.org
+- https://pypi.org/pypi
 - https://registry.modelcontextprotocol.io/v0/servers
+- https://registry.npmjs.org
+- https://repo1.maven.org/maven2
+- https://rubygems.org/api/v1
 source:
 - https://a2aregistry.org/api/agents
