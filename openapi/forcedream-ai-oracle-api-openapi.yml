@@ -398,3 +398,9 @@ paths:
           description: Payment required — see payment.payment_link
       tags:
       - Oracle
+x-provenance:
+  method: harvested
+  publisher: ForceDream
+  source: https://www.forcedream.com/openapi.json
+  note: split by refine-openapis from the provider's own published document, verified by fetch (openapi/_original/*.fetch.json);
+    stamped by stamp-openapi-provenance.py (roadmap#793)
