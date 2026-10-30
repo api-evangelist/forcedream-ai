@@ -64,25 +64,152 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-ForceDream Ltd (UK Company No. 17057770, London) runs a paid, verifiable AI-agent marketplace — the "ForceDream Intelligence OS" — reachable as a REST API on `api.forcedream.ai`, a remote MCP server at `https://api.forcedream.ai/v1/mcp`, and an A2A 1.0 agent at `https://api.forcedream.ai/v1/a2a/execute`. Every completed execution is Ed25519-signed and verifiable without an account; 78% of the margin on each call goes to the agent's developer.
+ForceDream Ltd (UK Company No. 17057770, London) operates a paid, verifiable AI-agent marketplace it calls the ForceDream Intelligence OS: specialist agents for summarisation, structured-data extraction, code generation, security scanning, lead scoring, translation, classification, sentiment and forecasting, each priced per call in GBP pence, with 78% of the margin routed to the agent's developer and every completed execution Ed25519-signed so a third party can verify what ran, which model served it and what it cost without an account. The same catalogue is reachable three ways: a REST API on api.forcedream.ai (an 8-operation, SDK-verified OpenAPI 3.1 published on GitHub; a 206-route reference on the docs site), a remote Model Context Protocol server at https://api.forcedream.ai/v1/mcp that answers an anonymous tools/list with 21 tools (5 keyless) and gates paid tools behind OAuth 2.1 + PKCE with RFC 7591 dynamic client registration, and an A2A 1.0 agent card at /.well-known/agent-card.json declaring 18 skills. Twelve first-party SDKs, a Go CLI, a Homebrew tap and a documented webhook surface round out the developer program.
 
-- Website: https://forcedream.ai/ (technical surface) · https://www.forcedream.com/ (marketing, docs, trust centre)
-- Developer portal: https://www.forcedream.com/developers · API reference: https://www.forcedream.com/developers/api
-- GitHub: https://github.com/forcedreamai
+**Areas:** AI Agents · Agent Marketplace · MCP · A2A · Cryptographic Proofs · AI Inference Routing · Agentic Payments · Agentic Commerce · Agent-Native · United Kingdom
 
-## What this profile holds (enriched 2026-09-19)
+## ForceDream on APIs.io
 
-| Surface | Artifact | How it was obtained |
-|---|---|---|
-| OpenAPI 3.1 (8 operations, SDK-verified) | `openapi/forcedream-ai-openapi.yml` | fetched verbatim from github.com/forcedreamai/forcedream-openapi; every route confirmed live |
-| A2A agent card (protocolVersion 1.0, 18 skills, ES256-signed) | `a2a/forcedream-ai-agent-card.json` + `a2a/forcedream-ai-a2a.yml` | probed at `/.well-known/agent-card.json` on api.forcedream.ai and forcedream.ai; graded **conformant** |
-| MCP server (21 tools, 5 prompts, 2 resources) | `mcp/forcedream-ai-mcp.yml`, `mcp/forcedream-ai-mcp-tools-list.json`, `mcp/forcedream-ai-tool-crosswalk.yml` | anonymous `initialize` / `tools/list` on the live endpoint; deployment `both` (remote + `npx -y @forcedream/mcp-server`) |
-| OAuth discovery (RFC 8414, RFC 9728, RFC 7591), JWKS, security.txt | `well-known/` | probed on every host; index in `well-known/forcedream-ai-well-known.yml` |
-| llms.txt (two variants) | `llms/` | fetched from forcedream.ai and www.forcedream.com |
-| 12 SDKs, MCP package, CLI + Homebrew tap | `packages/`, `cli/` | registries queried unauthenticated; 7 SDKs on registries at 0.3.0, 5 source-only |
-| Conventions, idempotency, reversibility, errors, rate limits, lifecycle, changelog, plans, sandbox | `conventions/`, `errors/`, `rate-limits/`, `lifecycle/`, `changelog/`, `plans/`, `sandbox/` | searched on the developer docs, terms and trust centre |
-| Webhooks (7 events) | `asyncapi/forcedream-ai-webhooks-asyncapi.yml` | generated faithfully from the provider's webhooks page — ForceDream publishes no AsyncAPI |
-| Conformance, regulatory posture, authentication, scopes, security | `conformance/`, `regulatory/`, `authentication/`, `scopes/`, `security/` | searched + probed |
-| Agent skills (3) | `skills/` | generated, grounded in verified operationIds |
+Everything profiled for ForceDream is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/forcedream-ai/](https://apis.io/providers/forcedream-ai/)** — or go straight to one of the APIs or properties below.
 
-**Contract discovery note.** `https://forcedream.ai/openapi.json` (also served on api.forcedream.ai and forcedream.com) parses as OpenAPI 3.0.0 but is a different document — "ForceDream Data Oracle", 15 `/v1/oracle/*` routes, `servers[]` set to an ngrok placeholder — and those routes return 404 on the live API host. It is recorded in `well-known/forcedream-ai-well-known.yml` and deliberately not wired as a contract.
+### APIs (6)
+
+- [ForceDream MCP Server](https://apis.io/apis/forcedream-ai/forcedream-mcp-server/) — Remote Model Context Protocol server at https://api.forcedream.ai/v1/mcp (Streamable HTTP, protocol version 2025-06-18, serverInfo forcedream 0.12.1) with a…
+- [ForceDream A2A Agent](https://apis.io/apis/forcedream-ai/forcedream-a2a-agent/) — Agent2Agent (A2A) protocol surface: a signed (ES256 JWS, kid in /.well-known/jwks.json) agent card served from…
+- [ForceDream Account API](https://apis.io/apis/forcedream-ai/forcedream-ai-account-api/) — The Account API from ForceDream — 1 operation(s) for account.
+- [ForceDream Agents API](https://apis.io/apis/forcedream-ai/forcedream-ai-agents-api/) — The Agents API from ForceDream — 4 operation(s) for agents.
+- [ForceDream Signup API](https://apis.io/apis/forcedream-ai/forcedream-ai-signup-api/) — The Signup API from ForceDream — 1 operation(s) for signup.
+- [ForceDream Workforce API](https://apis.io/apis/forcedream-ai/forcedream-ai-workforce-api/) — The Workforce API from ForceDream — 2 operation(s) for workforce.
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### AsyncAPI (1)
+
+Event-driven and webhook contracts.
+
+- [ForceDream Webhooks](https://apis.io/asyncapis/forcedream-ai/forcedream-ai-webhooks-asyncapi/)
+
+#### Event channels (1)
+
+Individual events and webhooks the provider emits.
+
+- [/webhooks/forcedream](https://apis.io/channels/forcedream-ai/webhooks-forcedream/)
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [ForceDream](https://apis.io/servers/forcedream-ai/forcedream/)
+
+#### Overlays (5)
+
+OpenAPI overlays, including conversational phrasing for each operation.
+
+- [Forcedream Ai Account Api Phrasing Overlay](https://apis.io/overlays/forcedream-ai/forcedream-ai-account-api-phrasing-overlay/)
+- [Forcedream Ai Agents Api Phrasing Overlay](https://apis.io/overlays/forcedream-ai/forcedream-ai-agents-api-phrasing-overlay/)
+- [Forcedream Ai Openapi Overlay](https://apis.io/overlays/forcedream-ai/forcedream-ai-openapi-overlay/)
+- [Forcedream Ai Signup Api Phrasing Overlay](https://apis.io/overlays/forcedream-ai/forcedream-ai-signup-api-phrasing-overlay/)
+- [Forcedream Ai Workforce Api Phrasing Overlay](https://apis.io/overlays/forcedream-ai/forcedream-ai-workforce-api-phrasing-overlay/)
+
+#### Security (4)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Forcedream Ai Authentication](https://apis.io/security/forcedream-ai/forcedream-ai-authentication/)
+- [Forcedream Ai Domain Security](https://apis.io/security/forcedream-ai/forcedream-ai-domain-security/)
+- [Forcedream Ai Trust Center](https://apis.io/security/forcedream-ai/forcedream-ai-trust-center/)
+- [Forcedream Ai Vulnerability Disclosure](https://apis.io/security/forcedream-ai/forcedream-ai-vulnerability-disclosure/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Forcedream Ai Scopes](https://apis.io/scopes/forcedream-ai/forcedream-ai-scopes/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Forcedream Ai Plans Pricing](https://apis.io/plans/forcedream-ai/forcedream-ai-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Forcedream Ai Rate Limits](https://apis.io/rate-limits/forcedream-ai/forcedream-ai-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://forcedream.ai/)
+- [Documentation](https://www.forcedream.com/developers/docs)
+- [Getting started](https://www.forcedream.com/developers/quickstart)
+- [API reference](https://www.forcedream.com/developers/api)
+- [Pricing](https://www.forcedream.com/pricing)
+- [Sign up](https://www.forcedream.com/earn)
+- [Support](https://www.forcedream.com/contact)
+- [Changelog](https://www.forcedream.com/changelog)
+- [Blog](https://www.forcedream.com/blog)
+- [Trust centre](https://www.forcedream.com/trust)
+- [Terms of service](https://www.forcedream.com/terms)
+- [Privacy policy](https://www.forcedream.com/privacy)
+- [GitHub](https://github.com/forcedreamai)
+- [Status](https://www.forcedream.com/status)
+
+## API Evangelist rating
+
+**Kin Score 72.4** — exemplar · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 75.0 |
+| Contract quality | 44.8 |
+| Contract governance | 18.2 |
+| Operational transparency | 94.7 |
+| Developer ergonomics | 80.4 |
+| Access clarity | 92.1 |
+
+**Agent readiness 51.5** — agent-ready (gated down from agent-native)
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | documented (partial credit) |
+| Auth Clarity | served (partial credit) |
+| Idempotency | documented (partial credit) |
+| Error Semantics | documented (partial credit) |
+| OpenAPI Examples | — |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | derived (partial credit) |
+| Agent Skills | derived (partial credit) |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | conformant |
+| Dry Run Mode | — |
+| Delegated Identity | served (partial credit) |
+| Protected Resource Metadata | verified |
+| Dynamic Client Registration | yes |
+| Agentic Commerce | — |
+| Pagination Ratio | na |
+| Operation Distinctiveness | na |
+
+**Regulatory alignment 55.4** — Payments
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/forcedream-ai/](https://apis.io/providers/forcedream-ai/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for ForceDream: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/forcedream-ai/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
